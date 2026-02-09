@@ -20,11 +20,11 @@
         </button>
 
         <div class="nav-links" :class="{ open: isMenuOpen }">
-          <RouterLink to="/" @click="closeMenu">Inicio</RouterLink>
-          <RouterLink to="/cultura" @click="closeMenu">Cultura e Historia</RouterLink>
-          <RouterLink to="/#provincias" @click="closeMenu">Provincias</RouterLink>
-          <RouterLink to="/#eventos" @click="closeMenu">Eventos</RouterLink>
-          <RouterLink to="/about" @click="closeMenu">Acerca de</RouterLink>
+          <RouterLink to="/" active-class="" exact-active-class="" @click="closeMenu">Inicio</RouterLink>
+          <RouterLink to="/cultura" active-class="" exact-active-class="" @click="closeMenu">Cultura e Historia</RouterLink>
+          <RouterLink to="/#provincias" active-class="" exact-active-class="" @click="closeMenu">Provincias</RouterLink>
+          <RouterLink to="/#eventos" active-class="" exact-active-class="" @click="closeMenu">Eventos</RouterLink>
+          <RouterLink to="/about" active-class="" exact-active-class="" @click="closeMenu">Acerca de</RouterLink>
         </div>
       </nav>
       <div v-if="isMenuOpen" class="nav-backdrop" @click="closeMenu"></div>
@@ -158,11 +158,21 @@ const closeMenu = () => {
   flex-direction: column;
   gap: 6px;
   background: rgba(0, 0, 0, 0.25);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 999px;
+  border: none;
+  border-radius: 12px;
   padding: 0.6rem 0.75rem;
   cursor: pointer;
   transition: background 0.3s, transform 0.3s;
+  outline: none;
+}
+
+.nav-toggle:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.8);
+  outline-offset: 2px;
+}
+
+.nav-toggle:active {
+  transform: translateY(0);
 }
 
 .nav-toggle:hover {
@@ -363,9 +373,14 @@ const closeMenu = () => {
     border-radius: 10px;
   }
 
-  .nav-links a:hover,
-  .nav-links a.router-link-active {
+  .nav-links a:hover {
     background: rgba(255, 255, 255, 0.12);
+  }
+
+  .nav-links a.router-link-active,
+  .nav-links a:active,
+  .nav-links a:focus {
+    background: transparent;
   }
 
   .nav-toggle {

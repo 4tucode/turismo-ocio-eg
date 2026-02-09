@@ -516,7 +516,8 @@ const getEventBackground = (event: any) => {
   box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 
-.circular-button:hover {
+.circular-button:hover,
+.circular-button:active {
   transform: scale(1.05);
   box-shadow: 0 6px 20px rgba(0,0,0,0.25);
 }
@@ -587,7 +588,8 @@ const getEventBackground = (event: any) => {
   transition: transform 0.3s;
 }
 
-.event-card:hover {
+.event-card:hover,
+.event-card:active {
   transform: translateY(-5px);
 }
 
@@ -618,7 +620,8 @@ const getEventBackground = (event: any) => {
   transition: transform 0.3s;
 }
 
-.event-card:hover .event-image img {
+.event-card:hover .event-image img,
+.event-card:active .event-image img {
   transform: scale(1.1);
 }
 
@@ -690,7 +693,8 @@ const getEventBackground = (event: any) => {
   z-index: 1;
 }
 
-.province-button:hover {
+.province-button:hover,
+.province-button:active {
   transform: scale(1.1);
   box-shadow: 0 6px 20px rgba(0,0,0,0.25);
 }
@@ -727,7 +731,8 @@ const getEventBackground = (event: any) => {
   flex-direction: column;
 }
 
-.article-card:hover {
+.article-card:hover,
+.article-card:active {
   transform: translateY(-5px);
   box-shadow: 0 6px 20px rgba(0,0,0,0.2);
 }
@@ -745,8 +750,27 @@ const getEventBackground = (event: any) => {
   transition: transform 0.3s;
 }
 
-.article-card:hover .article-image img {
+.article-card:hover .article-image img,
+.article-card:active .article-image img {
   transform: scale(1.1);
+}
+
+@media (hover: none) {
+  .circular-button:active {
+    transform: scale(1.04);
+  }
+
+  .event-card:active {
+    transform: translateY(-3px);
+  }
+
+  .province-button:active {
+    transform: scale(1.06);
+  }
+
+  .article-card:active {
+    transform: translateY(-3px);
+  }
 }
 
 .article-content {
@@ -793,11 +817,13 @@ const getEventBackground = (event: any) => {
 @media (max-width: 768px) {
   .button-row {
     gap: 1rem;
+    justify-content: center;
   }
 
   .circular-button {
-    width: 150px;
-    height: 150px;
+    width: 160px;
+    height: 160px;
+    max-width: 180px;
   }
 
   .button-text {
