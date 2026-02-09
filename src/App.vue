@@ -3,17 +3,31 @@
   <div id="app">
     <header class="header">
       <nav class="nav">
-        <RouterLink to="/" class="logo">
+        <RouterLink to="/" class="logo" @click="closeMenu">
           <img :src="logoImage" alt="Turismo y ocio EG" class="logo-img" />
         </RouterLink>
-        <div class="nav-links">
-          <RouterLink to="/">Inicio</RouterLink>
-          <RouterLink to="/cultura">Cultura e Historia</RouterLink>
-          <RouterLink to="/#provincias">Provincias</RouterLink>
-          <RouterLink to="/#eventos">Eventos</RouterLink>
-          <RouterLink to="/about">Acerca de</RouterLink>
+
+        <button
+          class="nav-toggle"
+          type="button"
+          :aria-expanded="isMenuOpen"
+          aria-label="Abrir menú"
+          @click="toggleMenu"
+        >
+          <span class="nav-toggle-bar"></span>
+          <span class="nav-toggle-bar"></span>
+          <span class="nav-toggle-bar"></span>
+        </button>
+
+        <div class="nav-links" :class="{ open: isMenuOpen }">
+          <RouterLink to="/" @click="closeMenu">Inicio</RouterLink>
+          <RouterLink to="/cultura" @click="closeMenu">Cultura e Historia</RouterLink>
+          <RouterLink to="/#provincias" @click="closeMenu">Provincias</RouterLink>
+          <RouterLink to="/#eventos" @click="closeMenu">Eventos</RouterLink>
+          <RouterLink to="/about" @click="closeMenu">Acerca de</RouterLink>
         </div>
       </nav>
+      <div v-if="isMenuOpen" class="nav-backdrop" @click="closeMenu"></div>
     </header>
     
     <main class="main">
@@ -72,10 +86,21 @@
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue'
 import { RouterLink, RouterView } from 'vue-router'
 import logoImage from './assets/logo-sin-fondo.png'
 import logoConFondoImage from './assets/loggo con fondo.jpeg'
 import bgFooterImage from './assets/bg-footer.png'
+
+const isMenuOpen = ref(false)
+
+const toggleMenu = () => {
+  isMenuOpen.value = !isMenuOpen.value
+}
+
+const closeMenu = () => {
+  isMenuOpen.value = false
+}
 </script>
 
 <style scoped>
@@ -106,6 +131,7 @@ import bgFooterImage from './assets/bg-footer.png'
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
+  position: relative;
 }
 
 .logo {
@@ -125,6 +151,35 @@ import bgFooterImage from './assets/bg-footer.png'
 .nav-links {
   display: flex;
   gap: 2rem;
+}
+
+.nav-toggle {
+  display: none;
+  flex-direction: column;
+  gap: 6px;
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 999px;
+  padding: 0.6rem 0.75rem;
+  cursor: pointer;
+  transition: background 0.3s, transform 0.3s;
+}
+
+.nav-toggle:hover {
+  background: rgba(0, 0, 0, 0.4);
+  transform: translateY(-1px);
+}
+
+.nav-toggle-bar {
+  width: 22px;
+  height: 2px;
+  background: #fff;
+  border-radius: 999px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+}
+
+.nav-backdrop {
+  display: none;
 }
 
 .nav-links a {
@@ -265,7 +320,7 @@ import bgFooterImage from './assets/bg-footer.png'
   }
   
   .nav {
-    flex-direction: column;
+    flex-direction: row;
     gap: 1rem;
     padding: 0 1rem;
   }
@@ -279,11 +334,50 @@ import bgFooterImage from './assets/bg-footer.png'
   }
   
   .nav-links {
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 0.75rem;
-    font-size: 0.85rem;
-    width: 100%;
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    right: 1rem;
+    left: 1rem;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 1rem;
+    background: rgba(20, 20, 20, 0.92);
+    border-radius: 16px;
+    box-shadow: 0 16px 30px rgba(0, 0, 0, 0.3);
+    transform: translateY(-10px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s, transform 0.3s;
+    font-size: 0.95rem;
+    z-index: 15;
+  }
+
+  .nav-links.open {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+
+  .nav-links a {
+    padding: 0.6rem 0.75rem;
+    border-radius: 10px;
+  }
+
+  .nav-links a:hover,
+  .nav-links a.router-link-active {
+    background: rgba(255, 255, 255, 0.12);
+  }
+
+  .nav-toggle {
+    display: flex;
+  }
+
+  .nav-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.35);
+    z-index: 9;
   }
 }
 

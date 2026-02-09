@@ -16,6 +16,10 @@
 
     <!-- Sección de Botones -->
     <section class="buttons-section">
+      <h2 class="section-title">Categorías</h2>
+      <p class="section-subtitle">
+        Selecciona una de nuestras categorías y descubre rutas, sabores, tradiciones y planes para cada tipo de viajero.
+      </p>
       <!-- Primera Fila -->
       <div class="button-row">
         <RouterLink 
@@ -57,6 +61,9 @@
     <!-- Sección Próximos Eventos -->
     <section class="events-section" id="eventos" v-if="blogStore.events.length > 0">
       <h2 class="section-title">Eventos</h2>
+      <p class="section-subtitle">
+        Mantente al día con festivales, ferias y actividades culturales que hacen vibrar cada provincia.
+      </p>
       <div class="events-grid">
         <RouterLink
           v-for="event in blogStore.events"
@@ -78,6 +85,9 @@
     <!-- Sección Provincias -->
     <section class="provinces-section" id="provincias" v-if="blogStore.provinces.length > 0">
       <h2 class="section-title">Nuestras Provincias</h2>
+      <p class="section-subtitle">
+        Explora cada provincia y descubre sus paisajes, su gente y sus lugares más emblemáticos.
+      </p>
       <div class="provinces-grid">
         <RouterLink
           v-for="province in blogStore.provinces"
@@ -119,6 +129,10 @@
 
     <!-- Sección Servicios -->
     <section class="buttons-section">
+      <h2 class="section-title">Servicios</h2>
+      <p class="section-subtitle">
+        Encuentra opciones de alquiler, alojamiento y agencias para planificar tu viaje con tranquilidad.
+      </p>
       <div class="button-row">
         <RouterLink 
           v-if="blogStore.services.length > 0"
@@ -552,6 +566,15 @@ const getEventBackground = (event: any) => {
   margin-bottom: 2rem;
 }
 
+.section-subtitle {
+  max-width: 720px;
+  margin: -1rem auto 2.5rem;
+  text-align: center;
+  color: #5b6b7a;
+  font-size: 1.05rem;
+  line-height: 1.6;
+}
+
 .events-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -798,6 +821,12 @@ const getEventBackground = (event: any) => {
 
   .section-title {
     font-size: 2rem;
+  }
+
+  .section-subtitle {
+    font-size: 0.95rem;
+    margin: -0.5rem auto 2rem;
+    padding: 0 0.5rem;
   }
 }
 </style>
