@@ -382,14 +382,17 @@ const cancelDelete = () => {
 const handleDeleteArticle = async () => {
   if (!articleToDelete.value) return
 
+  const deletedId = articleToDelete.value.id
+
   try {
-    await deleteArticle(articleToDelete.value.id)
+    await deleteArticle(deletedId)
     await loadArticles()
-    articleToDelete.value = null
-    
-    if (editingArticle.value?.id === articleToDelete.value.id) {
+
+    if (editingArticle.value?.id === deletedId) {
       resetForm()
     }
+
+    articleToDelete.value = null
   } catch (error) {
     console.error('Error al eliminar artículo:', error)
     alert('Error al eliminar el artículo')
