@@ -37,7 +37,7 @@
     <footer class="footer" :style="{ backgroundImage: `url(${bgFooterImage})` }">
       <div class="footer-content">
         <div class="footer-section">
-          <img :src="logoConFondoImage" alt="Turismo y ocio EG" class="footer-logo" />
+          <img :src="logoImage" alt="Turismo y ocio EG" class="footer-logo" />
           <p>Descubre Guinea Ecuatorial - Cultura, Naturaleza y Tradición</p>
         </div>
         
@@ -159,7 +159,7 @@ const closeMenu = () => {
   gap: 6px;
   background: rgba(0, 0, 0, 0.25);
   border: none;
-  border-radius: 12px;
+  border-radius: 5px;
   padding: 0.6rem 0.75rem;
   cursor: pointer;
   transition: background 0.3s, transform 0.3s;
@@ -247,10 +247,11 @@ const closeMenu = () => {
 }
 
 .footer-logo {
-  max-width: 200px;
+  max-width: 180px;
   height: auto;
   margin-bottom: 1rem;
   display: block;
+  filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.2));
 }
 
 .footer-section p {

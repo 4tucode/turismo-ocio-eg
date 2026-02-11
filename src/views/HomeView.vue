@@ -821,8 +821,8 @@ const getEventBackground = (event: any) => {
   }
 
   .circular-button {
-    width: 160px;
-    height: 160px;
+    width: 140px;
+    height: 140px;
     max-width: 180px;
   }
 

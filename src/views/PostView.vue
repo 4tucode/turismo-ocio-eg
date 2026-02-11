@@ -55,8 +55,10 @@ const formatDate = (dateString: string) => {
 
 <style scoped>
 .post-view {
-  max-width: 800px;
+  width: 70%;
+  max-width: 980px;
   margin: 0 auto;
+  padding-top: 140px;
 }
 
 .back-link {
@@ -81,7 +83,6 @@ const formatDate = (dateString: string) => {
 .post-hero-image {
   width: 100%;
   height: 400px;
-  margin: -2rem -2rem 2rem;
   border-radius: 8px 8px 0 0;
   overflow: hidden;
 }
@@ -128,7 +129,18 @@ const formatDate = (dateString: string) => {
 
 .post-content :deep(h2) {
   color: #2c3e50;
-  margin: 2rem 0 1rem;
+  margin: 1.5rem 0 0.75rem;
+  font-size: 1.5rem;
+}
+
+.post-content :deep(h3),
+.post-content :deep(h4),
+.post-content :deep(h5),
+.post-content :deep(h6) {
+  color: #2c3e50;
+  margin: 1rem 0 0.5rem;
+  font-size: 1.15rem;
+  font-weight: 600;
 }
 
 .post-content :deep(p) {
@@ -146,6 +158,11 @@ const formatDate = (dateString: string) => {
 }
 
 @media (max-width: 768px) {
+  .post-view {
+    width: 100%;
+    padding: 120px 1rem 0;
+  }
+
   .post-article h1 {
     font-size: 2rem;
   }

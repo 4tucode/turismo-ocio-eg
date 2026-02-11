@@ -56,11 +56,12 @@ const getBackLink = () => {
 .cultura-article {
   min-height: 100vh;
   background: #f8f9fa;
-  padding: 2rem 0;
+  padding: 140px 0 2rem;
 }
 
 .article-container {
-  max-width: 900px;
+  width: 70%;
+  max-width: 980px;
   margin: 0 auto;
   padding: 0 2rem;
 }
@@ -131,21 +132,30 @@ const getBackLink = () => {
 .article-body :deep(h1) {
   font-size: 2rem;
   color: #2c3e50;
-  margin: 2rem 0 1rem;
+  margin: 1.5rem 0 0.75rem;
   font-weight: bold;
 }
 
 .article-body :deep(h2) {
-  font-size: 1.75rem;
+  font-size: 1.5rem;
   color: #2c3e50;
-  margin: 2rem 0 1rem;
+  margin: 1.5rem 0 0.75rem;
   font-weight: bold;
 }
 
 .article-body :deep(h3) {
-  font-size: 1.5rem;
+  font-size: 1.15rem;
   color: #2c3e50;
-  margin: 1.5rem 0 0.75rem;
+  margin: 1rem 0 0.5rem;
+  font-weight: 600;
+}
+
+.article-body :deep(h4),
+.article-body :deep(h5),
+.article-body :deep(h6) {
+  font-size: 1.05rem;
+  color: #2c3e50;
+  margin: 0.75rem 0 0.5rem;
   font-weight: 600;
 }
 
@@ -182,7 +192,12 @@ const getBackLink = () => {
 
 @media (max-width: 768px) {
   .article-container {
+    width: 100%;
     padding: 0 1rem;
+  }
+
+  .cultura-article {
+    padding: 120px 0 2rem;
   }
 
   .article-header,
