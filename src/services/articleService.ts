@@ -8,6 +8,8 @@ import {
   query,
   where,
   orderBy,
+  limit,
+  onSnapshot,
   Timestamp,
   serverTimestamp
 } from 'firebase/firestore'
@@ -24,6 +26,7 @@ export interface Article {
   date: string
   imageUrl?: string
   imagePath?: string
+  location?: string
   createdAt?: any
   updatedAt?: any
 }
@@ -215,6 +218,82 @@ export async function getArticlesByCategory(category: string): Promise<Article[]
     ...doc.data(),
     date: doc.data().date?.toDate().toISOString().split('T')[0] || '',
   })) as Article[]
+}
+
+const mapArticle = (docSnap: any): Article => {
+  const data = docSnap.data() || {}
+  return {
+    id: docSnap.id,
+    title: data.title || '',
+    slug: data.slug || '',
+    excerpt: data.excerpt || '',
+    content: data.content || '',
+    category: data.category || 'cultura',
+    date: data.date?.toDate ? data.date.toDate().toISOString().split('T')[0] : (data.date || ''),
+    imageUrl: data.imageUrl || '',
+    imagePath: data.imagePath || '',
+    location: data.location || '',
+    createdAt: data.createdAt,
+    updatedAt: data.updatedAt
+  }
+}
+
+export function subscribeArticlesByCategory(
+  category: string,
+  onUpdate: (articles: Article[]) => void,
+  onError?: (error: any) => void
+): () => void {
+  const baseQuery = collection(db, 'posts')
+  let unsubscribe = () => {}
+
+  const subscribeWith = (useOrder: boolean) => {
+    const q = useOrder
+      ? query(baseQuery, where('category', '==', category), orderBy('createdAt', 'desc'))
+      : query(baseQuery, where('category', '==', category))
+
+    unsubscribe = onSnapshot(
+      q,
+      (snapshot) => {
+        onUpdate(snapshot.docs.map(mapArticle))
+      },
+      (error) => {
+        if (useOrder && error?.code === 'failed-precondition') {
+          unsubscribe()
+          subscribeWith(false)
+          return
+        }
+        if (onError) onError(error)
+      }
+    )
+  }
+
+  subscribeWith(true)
+
+  return () => unsubscribe()
+}
+
+export function subscribeArticleBySlug(
+  slug: string,
+  onUpdate: (article: Article | null) => void,
+  onError?: (error: any) => void
+): () => void {
+  const q = query(collection(db, 'posts'), where('slug', '==', slug), limit(1))
+
+  const unsubscribe = onSnapshot(
+    q,
+    (snapshot) => {
+      if (snapshot.empty) {
+        onUpdate(null)
+        return
+      }
+      onUpdate(mapArticle(snapshot.docs[0]))
+    },
+    (error) => {
+      if (onError) onError(error)
+    }
+  )
+
+  return () => unsubscribe()
 }
 
 // Actualizar artículo

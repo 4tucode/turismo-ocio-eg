@@ -10,11 +10,15 @@
         
         <div class="article-header">
           <h1 class="article-title">{{ article.title }}</h1>
-          <div v-if="article.location" class="article-meta">
-            <span class="location">📍 {{ article.location }}</span>
+          <div class="article-meta">
+            <span class="date">{{ formatDate(article.date) }}</span>
+            <span class="separator">•</span>
+            <span class="category">{{ formatCategory(article.category) }}</span>
+            <span v-if="article.location" class="separator">•</span>
+            <span v-if="article.location" class="location">📍 {{ article.location }}</span>
           </div>
         </div>
-        
+        <div class="article-divider"></div>
         <div class="article-body" v-html="article.content"></div>
       </article>
     </div>
@@ -27,16 +31,37 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useRoute, RouterLink } from 'vue-router'
-import { useBlogStore } from '../stores/blog'
+import type { Article } from '../services/articleService'
+import { subscribeArticleBySlug } from '../services/articleService'
 
 const route = useRoute()
-const blogStore = useBlogStore()
+const article = ref<Article | null>(null)
+let unsubscribe: (() => void) | null = null
 
-const article = computed(() => {
-  const slug = route.params.slug as string
-  return blogStore.getCulturaArticleBySlug(slug)
+const subscribeToArticle = (slug: string) => {
+  unsubscribe?.()
+  unsubscribe = subscribeArticleBySlug(slug, (data) => {
+    article.value = data
+  })
+}
+
+onMounted(() => {
+  subscribeToArticle(route.params.slug as string)
+})
+
+watch(
+  () => route.params.slug,
+  (newSlug: string | string[] | undefined) => {
+    if (typeof newSlug === 'string') {
+      subscribeToArticle(newSlug)
+    }
+  }
+)
+
+onUnmounted(() => {
+  unsubscribe?.()
 })
 
 const getBackLink = () => {
@@ -50,17 +75,33 @@ const getBackLink = () => {
   }
   return categoryMap[category] || '/cultura'
 }
+
+const formatDate = (dateString?: string) => {
+  if (!dateString) return ''
+  const date = new Date(dateString)
+  if (Number.isNaN(date.getTime())) return dateString
+  return date.toLocaleDateString('es-ES', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  })
+}
+
+const formatCategory = (category?: string) => {
+  if (!category) return ''
+  return category.charAt(0).toUpperCase() + category.slice(1)
+}
 </script>
 
 <style scoped>
 .cultura-article {
   min-height: 100vh;
-  background: #f8f9fa;
+  background: #4b5c7d;
   padding: 140px 0 2rem;
 }
 
 .article-container {
-  width: 70%;
+  width: 78%;
   max-width: 980px;
   margin: 0 auto;
   padding: 0 2rem;
@@ -81,9 +122,7 @@ const getBackLink = () => {
 
 .article-content {
   background: white;
-  border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
 .article-hero-image {
@@ -113,13 +152,23 @@ const getBackLink = () => {
 
 .article-meta {
   display: flex;
-  gap: 1rem;
-  margin-top: 1rem;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  color: #64748b;
+  font-size: 0.95rem;
 }
 
 .location {
-  color: #667eea;
+  color: #475569;
   font-weight: 500;
+}
+
+.article-divider {
+  height: 1px;
+  background: #e2e8f0;
+  margin: 1.5rem 3rem 0;
 }
 
 .article-body {
@@ -228,6 +277,10 @@ const getBackLink = () => {
 
   .article-body :deep(h3) {
     font-size: 1.1rem;
+  }
+
+  .article-divider {
+    margin: 1.25rem 1.5rem 0;
   }
 }
 </style>

@@ -11,15 +11,16 @@
         <h1>{{ post.title }}</h1>
         
         <div class="post-meta">
-          <span class="author">Por {{ post.author }}</span>
           <span class="date">{{ formatDate(post.date) }}</span>
+          <span class="separator">•</span>
+          <span class="category">{{ formatCategory(post.category) }}</span>
         </div>
+        <div class="post-divider"></div>
+        <div class="post-content" v-html="post.content"></div>
         
-        <div class="tags">
+        <div class="tags" v-if="post.tags?.length">
           <span v-for="tag in post.tags" :key="tag" class="tag">{{ tag }}</span>
         </div>
-        
-        <div class="post-content" v-html="post.content"></div>
       </article>
     </div>
     
@@ -50,6 +51,11 @@ const formatDate = (dateString: string) => {
     month: 'long', 
     day: 'numeric' 
   })
+}
+
+const formatCategory = (category?: string) => {
+  if (!category) return ''
+  return category.charAt(0).toUpperCase() + category.slice(1)
 }
 </script>
 
@@ -101,17 +107,23 @@ const formatDate = (dateString: string) => {
 
 .post-meta {
   display: flex;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
-  color: #666;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+  color: #64748b;
   font-size: 0.875rem;
+}
+
+.post-divider {
+  height: 1px;
+  background: #e2e8f0;
+  margin: 1rem 0 1.5rem;
 }
 
 .tags {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
-  margin-bottom: 2rem;
+  margin-top: 2rem;
 }
 
 .tag {

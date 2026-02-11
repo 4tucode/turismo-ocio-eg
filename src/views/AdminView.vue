@@ -422,7 +422,9 @@ onMounted(() => {
 <style scoped>
 .admin-view {
   min-height: 100vh;
-  background-color: #f5f5f5;
+  background: #0f172a;
+  background-image: radial-gradient(circle at top, rgba(148, 163, 184, 0.15), transparent 60%);
+  color: #0f172a;
 }
 
 /* Login */
@@ -431,37 +433,42 @@ onMounted(() => {
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 45%, #0f172a 100%);
+  padding: 2rem 1.5rem;
 }
 
 .login-box {
-  background: white;
-  padding: 2rem;
-  border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  background: rgba(255, 255, 255, 0.98);
+  padding: 2.5rem;
+  border-radius: 20px;
+  box-shadow: 0 25px 60px rgba(15, 23, 42, 0.35);
   width: 100%;
   max-width: 400px;
+  border: 1px solid rgba(148, 163, 184, 0.2);
 }
 
 .login-box h2 {
   margin-bottom: 1.5rem;
-  color: #333;
+  color: #0f172a;
   text-align: center;
+  font-size: 1.5rem;
 }
 
 /* Admin Panel */
 .admin-panel {
   min-height: 100vh;
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 45%, #0f172a 100%);
+  padding-top: 120px;
 }
 
 .admin-header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
   color: white;
   padding: 1.5rem 2rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.25);
 }
 
 .admin-header h1 {
@@ -470,33 +477,35 @@ onMounted(() => {
 }
 
 .btn-logout {
-  background: rgba(255,255,255,0.2);
+  background: rgba(255, 255, 255, 0.1);
   color: white;
-  border: 1px solid rgba(255,255,255,0.3);
-  padding: 0.5rem 1rem;
-  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  padding: 0.55rem 1.2rem;
+  border-radius: 999px;
   cursor: pointer;
-  transition: background 0.3s;
+  transition: background 0.3s, transform 0.2s;
 }
 
 .btn-logout:hover {
-  background: rgba(255,255,255,0.3);
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-1px);
 }
 
 .admin-content {
   display: grid;
   grid-template-columns: 1fr 350px;
   gap: 2rem;
-  padding: 2rem;
+  padding: 2.5rem 2rem 3rem;
   max-width: 1400px;
   margin: 0 auto;
 }
 
 .admin-main {
   background: white;
-  padding: 2rem;
-  border-radius: 12px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  padding: 2.5rem;
+  border-radius: 18px;
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
+  border: 1px solid rgba(148, 163, 184, 0.2);
 }
 
 .admin-main h2 {
@@ -507,9 +516,10 @@ onMounted(() => {
 
 .admin-aside {
   background: white;
-  padding: 1.5rem;
-  border-radius: 12px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  padding: 1.75rem;
+  border-radius: 18px;
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
+  border: 1px solid rgba(148, 163, 184, 0.2);
   height: fit-content;
   position: sticky;
   top: 2rem;
@@ -535,6 +545,7 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  margin-bottom: 1rem;
 }
 
 .form-group label {
@@ -545,11 +556,22 @@ onMounted(() => {
 .form-input,
 .form-select,
 .form-textarea {
-  padding: 0.75rem;
-  border: 1px solid #ddd;
-  border-radius: 6px;
+  padding: 0.85rem 1rem;
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  border-radius: 12px;
   font-size: 1rem;
   font-family: inherit;
+  background: #f8fafc;
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+}
+
+.form-input:focus,
+.form-select:focus,
+.form-textarea:focus {
+  outline: none;
+  border-color: #4f46e5;
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
 }
 
 .form-textarea {
@@ -585,15 +607,15 @@ onMounted(() => {
 .form-actions {
   display: flex;
   gap: 1rem;
-  margin-top: 1rem;
+  margin-top: 1.75rem;
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #1f2937;
   color: white;
   border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 6px;
+  padding: 0.85rem 1.75rem;
+  border-radius: 12px;
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
@@ -611,11 +633,11 @@ onMounted(() => {
 }
 
 .btn-secondary {
-  background: #e0e0e0;
-  color: #333;
+  background: #e2e8f0;
+  color: #1f2937;
   border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 6px;
+  padding: 0.85rem 1.5rem;
+  border-radius: 12px;
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
@@ -641,8 +663,9 @@ onMounted(() => {
 .upload-progress {
   margin-top: 1rem;
   padding: 1rem;
-  background: #f5f5f5;
-  border-radius: 6px;
+  background: #f8fafc;
+  border-radius: 12px;
+  border: 1px solid rgba(148, 163, 184, 0.2);
 }
 
 .progress-bar {
@@ -656,7 +679,7 @@ onMounted(() => {
 
 .progress-fill {
   height: 100%;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
   transition: width 0.3s ease;
 }
 
@@ -675,10 +698,11 @@ onMounted(() => {
 }
 
 .article-item {
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  border-radius: 12px;
   padding: 1rem;
   transition: all 0.2s;
+  background: #ffffff;
 }
 
 .article-item:hover {
@@ -686,8 +710,8 @@ onMounted(() => {
 }
 
 .article-item.active {
-  border-color: #667eea;
-  background: #f3f4ff;
+  border-color: #4f46e5;
+  background: #eef2ff;
 }
 
 .article-item-content h3 {
@@ -706,7 +730,7 @@ onMounted(() => {
 
 .category-badge {
   padding: 0.25rem 0.5rem;
-  border-radius: 4px;
+  border-radius: 999px;
   font-size: 0.75rem;
   font-weight: 600;
   text-transform: capitalize;
@@ -760,11 +784,11 @@ onMounted(() => {
 
 .btn-edit {
   flex: 1;
-  background: #2196f3;
+  background: #2563eb;
   color: white;
   border: none;
   padding: 0.5rem;
-  border-radius: 4px;
+  border-radius: 999px;
   cursor: pointer;
   font-size: 0.875rem;
   transition: background 0.2s;
@@ -776,11 +800,11 @@ onMounted(() => {
 
 .btn-delete {
   flex: 1;
-  background: #f44336;
+  background: #ef4444;
   color: white;
   border: none;
   padding: 0.5rem;
-  border-radius: 4px;
+  border-radius: 999px;
   cursor: pointer;
   font-size: 0.875rem;
   transition: background 0.2s;
@@ -814,9 +838,10 @@ onMounted(() => {
 .modal-content {
   background: white;
   padding: 2rem;
-  border-radius: 12px;
+  border-radius: 16px;
   max-width: 400px;
   width: 90%;
+  box-shadow: 0 20px 50px rgba(15, 23, 42, 0.25);
 }
 
 .modal-content h3 {

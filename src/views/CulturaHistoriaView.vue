@@ -8,7 +8,7 @@
     <section class="articles-section">
       <div class="articles-grid">
         <RouterLink
-          v-for="article in blogStore.getCulturaArticlesByCategory('cultura')"
+          v-for="article in articles"
           :key="article.id"
           :to="`/cultura/${article.slug}`"
           class="article-card"
@@ -31,27 +31,44 @@
 
 <script setup lang="ts">
 import { RouterLink } from 'vue-router'
-import { useBlogStore } from '../stores/blog'
+import { ref, onMounted, onUnmounted } from 'vue'
 import heroImage from '../assets/cultura.webp'
+import type { Article } from '../services/articleService'
+import { subscribeArticlesByCategory } from '../services/articleService'
 
-const blogStore = useBlogStore()
+const articles = ref<Article[]>([])
+let unsubscribe: (() => void) | null = null
+
+onMounted(() => {
+  unsubscribe = subscribeArticlesByCategory('cultura', (data) => {
+    articles.value = data
+  })
+})
+
+onUnmounted(() => {
+  unsubscribe?.()
+})
 </script>
 
 <style scoped>
 .cultura-historia {
   min-height: 100vh;
   background: #f8f9fa;
-  padding-top: 120px;
 }
 
 .hero-section {
   position: relative;
-  background-image: linear-gradient(rgba(18, 24, 38, 0.55), rgba(18, 24, 38, 0.55)), url('../assets/cultura.webp');
+  background-image: linear-gradient(rgba(18, 24, 38, 0.55), rgba(18, 24, 38, 0.55)), url('/src/assets/cultura.webp');
   background-size: cover;
   background-position: center;
   color: white;
   padding: 4rem 2rem;
   text-align: center;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .hero-title {
@@ -145,10 +162,6 @@ const blogStore = useBlogStore()
 }
 
 @media (max-width: 768px) {
-  .cultura-historia {
-    padding-top: 110px;
-  }
-
   .hero-title {
     font-size: 2rem;
   }
@@ -163,6 +176,11 @@ const blogStore = useBlogStore()
 
   .articles-section {
     padding: 2rem 1rem;
+  }
+
+  .hero-section {
+    height: 70vh;
+    padding: 3rem 1.5rem;
   }
 }
 </style>

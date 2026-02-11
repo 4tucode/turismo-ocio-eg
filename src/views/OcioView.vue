@@ -8,13 +8,13 @@
     <section class="articles-section">
       <div class="articles-grid">
         <RouterLink
-          v-for="article in blogStore.getCulturaArticlesByCategory('ocio')"
+          v-for="article in articles"
           :key="article.id"
           :to="`/ocio/${article.slug}`"
           class="article-card"
         >
-          <div v-if="article.imageUrl" class="article-image">
-            <img :src="article.imageUrl" :alt="article.title" />
+          <div class="article-image">
+            <img :src="article.imageUrl || heroImage" :alt="article.title" />
           </div>
           <div class="article-content">
             <h2 class="article-title">{{ article.title }}</h2>
@@ -31,9 +31,23 @@
 
 <script setup lang="ts">
 import { RouterLink } from 'vue-router'
-import { useBlogStore } from '../stores/blog'
+import { ref, onMounted, onUnmounted } from 'vue'
+import heroImage from '../assets/paseo.jpg'
+import type { Article } from '../services/articleService'
+import { subscribeArticlesByCategory } from '../services/articleService'
 
-const blogStore = useBlogStore()
+const articles = ref<Article[]>([])
+let unsubscribe: (() => void) | null = null
+
+onMounted(() => {
+  unsubscribe = subscribeArticlesByCategory('ocio', (data) => {
+    articles.value = data
+  })
+})
+
+onUnmounted(() => {
+  unsubscribe?.()
+})
 </script>
 
 <style scoped>
