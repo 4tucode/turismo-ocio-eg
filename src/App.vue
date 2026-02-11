@@ -75,11 +75,15 @@
               </svg>
             </a>
           </div>
+          <div class="footer-dev">
+            <h4>Desarrollado por</h4>
+            <img :src="logo4tucode" alt="4tucode" />
+          </div>
         </div>
       </div>
       
       <div class="footer-bottom">
-        <p>&copy; 2025 Blog de Silvia. Todos los derechos reservados.</p>
+        <p>&copy; 2026 Turismo y Ocio EG. Todos los derechos reservados.</p>
       </div>
     </footer>
   </div>
@@ -91,6 +95,7 @@ import { RouterLink, RouterView } from 'vue-router'
 import logoImage from './assets/logo-sin-fondo.png'
 import logoConFondoImage from './assets/loggo con fondo.jpeg'
 import bgFooterImage from './assets/bg-footer.png'
+import logo4tucode from './assets/4tucode.png'
 
 const isMenuOpen = ref(false)
 
@@ -221,7 +226,6 @@ const closeMenu = () => {
   background-position: center;
   background-repeat: no-repeat;
   color: #6b4423;
-  margin-top: 4rem;
   position: relative;
   z-index: 10;
 }
@@ -297,6 +301,26 @@ const closeMenu = () => {
   color: #c97a54;
   transform: translateY(-3px);
   opacity: 1;
+}
+
+.footer-dev {
+  margin-top: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.footer-dev span {
+  font-size: 0.9rem;
+  color: #6b4423;
+  opacity: 0.9;
+}
+
+.footer-dev img {
+  width: 140px;
+  max-width: 100%;
+  height: auto;
+  filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.2));
 }
 
 .footer-bottom {

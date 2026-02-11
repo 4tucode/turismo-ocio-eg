@@ -13,8 +13,8 @@
           :to="`/cultura/${article.slug}`"
           class="article-card"
         >
-          <div v-if="article.imageUrl" class="article-image">
-            <img :src="article.imageUrl" :alt="article.title" />
+          <div class="article-image">
+            <img :src="article.imageUrl || heroImage" :alt="article.title" />
           </div>
           <div class="article-content">
             <h2 class="article-title">{{ article.title }}</h2>
@@ -32,6 +32,7 @@
 <script setup lang="ts">
 import { RouterLink } from 'vue-router'
 import { useBlogStore } from '../stores/blog'
+import heroImage from '../assets/cultura.webp'
 
 const blogStore = useBlogStore()
 </script>
@@ -40,10 +41,14 @@ const blogStore = useBlogStore()
 .cultura-historia {
   min-height: 100vh;
   background: #f8f9fa;
+  padding-top: 120px;
 }
 
 .hero-section {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  position: relative;
+  background-image: linear-gradient(rgba(18, 24, 38, 0.55), rgba(18, 24, 38, 0.55)), url('../assets/cultura.webp');
+  background-size: cover;
+  background-position: center;
   color: white;
   padding: 4rem 2rem;
   text-align: center;
@@ -140,6 +145,10 @@ const blogStore = useBlogStore()
 }
 
 @media (max-width: 768px) {
+  .cultura-historia {
+    padding-top: 110px;
+  }
+
   .hero-title {
     font-size: 2rem;
   }
