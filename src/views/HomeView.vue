@@ -15,7 +15,16 @@
       <HeroSlider :slides="portadaSlides" />
 
     <!-- Sección de Botones -->
-    <section class="buttons-section">
+    <section class="buttons-section section-anchor" id="categorias" data-section="categorias">
+      <button
+        class="back-to-top"
+        :class="{ show: activeSection === 'categorias' }"
+        type="button"
+        @click="scrollToTop"
+        aria-label="Volver arriba"
+      >
+        🚀 Volver arriba
+      </button>
       <h2 class="section-title">Categorías</h2>
       <p class="section-subtitle">
         Selecciona una de nuestras categorías y descubre rutas, sabores, tradiciones y planes para cada tipo de viajero.
@@ -59,7 +68,16 @@
     </section>
 
     <!-- Sección Próximos Eventos -->
-    <section class="events-section" id="eventos" v-if="blogStore.events.length > 0">
+    <section class="events-section section-anchor" id="eventos" data-section="eventos" v-if="blogStore.events.length > 0">
+      <button
+        class="back-to-top"
+        :class="{ show: activeSection === 'eventos' }"
+        type="button"
+        @click="scrollToTop"
+        aria-label="Volver arriba"
+      >
+        🎉 Volver arriba
+      </button>
       <h2 class="section-title">Eventos</h2>
       <p class="section-subtitle">
         Mantente al día con festivales, ferias y actividades culturales que hacen vibrar cada provincia.
@@ -83,7 +101,16 @@
     </section>
 
     <!-- Sección Provincias -->
-    <section class="provinces-section" id="provincias" v-if="blogStore.provinces.length > 0">
+    <section class="provinces-section section-anchor" id="provincias" data-section="provincias" v-if="blogStore.provinces.length > 0">
+      <button
+        class="back-to-top"
+        :class="{ show: activeSection === 'provincias' }"
+        type="button"
+        @click="scrollToTop"
+        aria-label="Volver arriba"
+      >
+        🧭 Volver arriba
+      </button>
       <h2 class="section-title">Nuestras Provincias</h2>
       <p class="section-subtitle">
         Explora cada provincia y descubre sus paisajes, su gente y sus lugares más emblemáticos.
@@ -103,7 +130,16 @@
     </section>
 
     <!-- Sección Blog - Artículos Destacados -->
-    <section class="blog-section" id="noticias" v-if="blogStore.featuredPosts.length > 0">
+    <section class="blog-section section-anchor" id="noticias" data-section="noticias" v-if="blogStore.featuredPosts.length > 0">
+      <button
+        class="back-to-top"
+        :class="{ show: activeSection === 'noticias' }"
+        type="button"
+        @click="scrollToTop"
+        aria-label="Volver arriba"
+      >
+        📰 Volver arriba
+      </button>
       <h2 class="section-title">Artículos Destacados</h2>
       <div class="articles-grid">
         <RouterLink
@@ -128,7 +164,16 @@
     </section>
 
     <!-- Sección Servicios -->
-    <section class="buttons-section">
+    <section class="buttons-section section-anchor" id="servicios" data-section="servicios">
+      <button
+        class="back-to-top"
+        :class="{ show: activeSection === 'servicios' }"
+        type="button"
+        @click="scrollToTop"
+        aria-label="Volver arriba"
+      >
+        ✨ Volver arriba
+      </button>
       <h2 class="section-title">Servicios</h2>
       <p class="section-subtitle">
         Encuentra opciones de alquiler, alojamiento y agencias para planificar tu viaje con tranquilidad.
@@ -168,7 +213,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter, RouterLink } from 'vue-router'
 import { useBlogStore } from '../stores/blog'
 import AdBanner from '../components/AdBanner.vue'
@@ -196,6 +241,9 @@ import v2Video from '../assets/v2.mp4'
 const router = useRouter()
 const blogStore = useBlogStore()
 const searchQuery = ref('')
+const activeSection = ref<string | null>(null)
+let sectionObserver: IntersectionObserver | null = null
+const sectionRatios = new Map<string, number>()
 
 // Slides de portada con vídeos de fondo (v1, v2) y textos
 const portadaSlides = computed<Slide[]>(() => [
@@ -232,6 +280,10 @@ const handleSearch = () => {
     // Implementar búsqueda
     console.log('Buscando:', searchQuery.value)
   }
+}
+
+const scrollToTop = () => {
+  window.scrollTo({ top: 0, behavior: 'smooth' })
 }
 
 const getCategoryImage = (category: string) => {
@@ -419,6 +471,39 @@ const getEventBackground = (event: any) => {
   }
   return {}
 }
+
+onMounted(() => {
+  sectionObserver = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        const id = (entry.target as HTMLElement).dataset.section
+        if (!id) return
+        sectionRatios.set(id, entry.isIntersecting ? entry.intersectionRatio : 0)
+      })
+
+      let maxId: string | null = null
+      let maxRatio = 0
+      sectionRatios.forEach((ratio, id) => {
+        if (ratio > maxRatio) {
+          maxRatio = ratio
+          maxId = id
+        }
+      })
+      activeSection.value = maxRatio > 0 ? maxId : null
+    },
+    { threshold: [0.25, 0.4, 0.6, 0.8] }
+  )
+
+  document.querySelectorAll<HTMLElement>('section[data-section]').forEach((section) => {
+    sectionObserver?.observe(section)
+  })
+})
+
+onUnmounted(() => {
+  sectionObserver?.disconnect()
+  sectionObserver = null
+  sectionRatios.clear()
+})
 </script>
 
 <style scoped>
@@ -490,6 +575,53 @@ const getEventBackground = (event: any) => {
   padding: 3rem 2rem;
   max-width: 1400px;
   margin: 0 auto;
+}
+
+.section-anchor {
+  position: relative;
+}
+
+.back-to-top {
+  position: absolute;
+  right: 1.5rem;
+  bottom: 1.5rem;
+  z-index: 5;
+  border: none;
+  outline: none;
+  border-radius: 999px;
+  padding: 0.75rem 1.1rem;
+  background: rgba(17, 24, 39, 0.9);
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  opacity: 0;
+  transform: translateY(10px) rotate(-2deg);
+  pointer-events: none;
+  transition: opacity 0.25s ease, transform 0.25s ease, background 0.25s ease;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.25);
+  animation: floaty 3s ease-in-out infinite;
+}
+
+.back-to-top:hover,
+.back-to-top:active {
+  background: rgba(29, 78, 216, 0.95);
+}
+
+.back-to-top.show {
+  opacity: 1;
+  transform: translateY(0) rotate(0);
+  pointer-events: auto;
+}
+
+@keyframes floaty {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
 }
 
 .button-row {
@@ -815,6 +947,13 @@ const getEventBackground = (event: any) => {
 }
 
 @media (max-width: 768px) {
+  .back-to-top {
+    right: 1rem;
+    bottom: 1rem;
+    font-size: 0.85rem;
+    padding: 0.6rem 0.9rem;
+  }
+
   .button-row {
     gap: 1rem;
     justify-content: center;

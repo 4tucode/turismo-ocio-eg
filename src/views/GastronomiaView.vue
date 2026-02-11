@@ -1,5 +1,5 @@
 <template>
-  <div class="gastronomia">
+  <div class="gastronomia cultura-article">
     <div class="hero-section">
       <h1 class="hero-title">Gastronomía</h1>
       <p class="hero-subtitle">Descubre los sabores y tradiciones culinarias de Guinea Ecuatorial</p>
@@ -53,14 +53,30 @@ onUnmounted(() => {
 <style scoped>
 .gastronomia {
   min-height: 100vh;
-  background: #f8f9fa;
+}
+
+.cultura-article {
+  background-image: url('https://wallpapers.com/images/hd/food-4k-3gsi5u6kjma5zkj0.jpg');
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
 }
 
 .hero-section {
-  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  position: relative;
+  background-image: linear-gradient(rgba(18, 24, 38, 0.55), rgba(18, 24, 38, 0.55)),
+    url('../assets/comidaguineana.jpg');
+  background-size: cover;
+  background-position: center;
   color: white;
   padding: 4rem 2rem;
   text-align: center;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .hero-title {
@@ -154,6 +170,15 @@ onUnmounted(() => {
 }
 
 @media (max-width: 768px) {
+  .cultura-article {
+    background-attachment: scroll;
+  }
+
+  .hero-section {
+    height: 70vh;
+    padding: 3rem 1.5rem;
+  }
+
   .hero-title {
     font-size: 2rem;
   }

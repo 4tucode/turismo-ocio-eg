@@ -21,9 +21,10 @@
 
         <div class="nav-links" :class="{ open: isMenuOpen }">
           <RouterLink to="/" active-class="" exact-active-class="" @click="closeMenu">Inicio</RouterLink>
-          <RouterLink to="/cultura" active-class="" exact-active-class="" @click="closeMenu">Cultura e Historia</RouterLink>
-          <RouterLink to="/#provincias" active-class="" exact-active-class="" @click="closeMenu">Provincias</RouterLink>
-          <RouterLink to="/#eventos" active-class="" exact-active-class="" @click="closeMenu">Eventos</RouterLink>
+          <RouterLink to="#categorias" active-class="" exact-active-class="" @click="closeMenu">Categorías</RouterLink>
+          <RouterLink to="#eventos" active-class="" exact-active-class="" @click="closeMenu">Eventos</RouterLink>
+          <RouterLink to="#provincias" active-class="" exact-active-class="" @click="closeMenu">Provincias</RouterLink>
+          <RouterLink to="#servicios" active-class="" exact-active-class="" @click="closeMenu">Servicios</RouterLink>
           <RouterLink to="/about" active-class="" exact-active-class="" @click="closeMenu">Acerca de</RouterLink>
         </div>
       </nav>

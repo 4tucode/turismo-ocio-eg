@@ -2,6 +2,15 @@
   <div class="cultura-article">
     <div v-if="article" class="article-container">
       <RouterLink :to="getBackLink()" class="back-link">← Volver</RouterLink>
+      <nav class="breadcrumbs" aria-label="Migas de pan">
+        <RouterLink to="/" class="breadcrumb-link">Inicio</RouterLink>
+        <span class="breadcrumb-separator">/</span>
+        <RouterLink :to="getBackLink()" class="breadcrumb-link">
+          {{ article?.category ? formatCategory(article.category) : 'Categoría' }}
+        </RouterLink>
+        <span class="breadcrumb-separator">/</span>
+        <span class="breadcrumb-current">{{ article?.title || 'Artículo' }}</span>
+      </nav>
       
       <article class="article-content">
         <div v-if="article.imageUrl" class="article-hero-image">
@@ -96,7 +105,11 @@ const formatCategory = (category?: string) => {
 <style scoped>
 .cultura-article {
   min-height: 100vh;
-  background: #4b5c7d;
+  background-image: url('https://wallpapers.com/images/hd/food-4k-3gsi5u6kjma5zkj0.jpg');
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
   padding: 140px 0 2rem;
 }
 
@@ -118,6 +131,35 @@ const formatCategory = (category?: string) => {
 
 .back-link:hover {
   color: #764ba2;
+}
+
+.breadcrumbs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin: -1rem 0 2rem;
+  color: #e2e8f0;
+  font-size: 0.95rem;
+}
+
+.breadcrumb-link {
+  color: #e2e8f0;
+  text-decoration: none;
+  transition: color 0.3s;
+}
+
+.breadcrumb-link:hover {
+  color: #ffffff;
+}
+
+.breadcrumb-separator {
+  opacity: 0.7;
+}
+
+.breadcrumb-current {
+  color: #f8fafc;
+  font-weight: 600;
 }
 
 .article-content {
@@ -240,6 +282,10 @@ const formatCategory = (category?: string) => {
 }
 
 @media (max-width: 768px) {
+  .cultura-article {
+    background-attachment: scroll;
+  }
+
   .article-container {
     width: 100%;
     padding: 0 1rem;
