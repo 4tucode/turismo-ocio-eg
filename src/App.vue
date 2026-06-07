@@ -47,8 +47,8 @@
           <ul>
             <li><RouterLink to="/">Inicio</RouterLink></li>
             <li><RouterLink to="/about">Acerca de</RouterLink></li>
-            <li><RouterLink to="/hospedaje">Hospedaje</RouterLink></li>
-            <li><RouterLink to="/transporte">Transporte</RouterLink></li>
+            <li><RouterLink to="/#servicios">Hospedaje</RouterLink></li>
+            <li><RouterLink to="/#servicios">Transporte</RouterLink></li>
           </ul>
         </div>
         
@@ -94,7 +94,6 @@
 import { ref } from 'vue'
 import { RouterLink, RouterView } from 'vue-router'
 import logoImage from './assets/logo-sin-fondo.png'
-import logoConFondoImage from './assets/loggo con fondo.jpeg'
 import bgFooterImage from './assets/bg-footer.png'
 import logo4tucode from './assets/4tucode.png'
 

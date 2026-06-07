@@ -182,7 +182,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted, computed } from 'vue'
+import { ref, reactive, onMounted, onUnmounted, watch } from 'vue'
 import { 
   createArticle, 
   getAllArticles, 
@@ -216,11 +216,20 @@ const submitError = ref('')
 const submitSuccess = ref('')
 const articleToDelete = ref<Article | null>(null)
 
-const imagePreview = computed(() => {
-  if (formData.imageFile) {
-    return URL.createObjectURL(formData.imageFile)
+const imagePreview = ref('')
+
+watch(
+  () => formData.imageFile,
+  (newFile, _oldFile) => {
+    if (imagePreview.value) {
+      URL.revokeObjectURL(imagePreview.value)
+    }
+    imagePreview.value = newFile ? URL.createObjectURL(newFile) : ''
   }
-  return ''
+)
+
+onUnmounted(() => {
+  if (imagePreview.value) URL.revokeObjectURL(imagePreview.value)
 })
 
 const handleLogin = () => {

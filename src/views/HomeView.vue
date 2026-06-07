@@ -83,10 +83,9 @@
         Mantente al día con festivales, ferias y actividades culturales que hacen vibrar cada provincia.
       </p>
       <div class="events-grid">
-        <RouterLink
+        <div
           v-for="event in blogStore.events"
           :key="event.id"
-          :to="`/evento/${event.slug}`"
           class="event-card"
           :class="{ 'event-card-with-bg': isEventWithBackground(event) }"
           :style="getEventBackground(event)"
@@ -96,7 +95,7 @@
           </div>
           <div class="event-overlay" v-if="isEventWithBackground(event)"></div>
           <h3 class="event-title">{{ event.title }}</h3>
-        </RouterLink>
+        </div>
       </div>
     </section>
 
@@ -179,33 +178,30 @@
         Encuentra opciones de alquiler, alojamiento y agencias para planificar tu viaje con tranquilidad.
       </p>
       <div class="button-row">
-        <RouterLink 
+        <div
           v-if="blogStore.services.length > 0"
-          to="/servicios/alquiler-coches" 
           class="circular-button"
           :style="{ backgroundImage: `url(${blogStore.services[0]?.imageUrl || ''})` }"
         >
           <div class="button-overlay"></div>
           <span class="button-text">Alquiler de Coches</span>
-        </RouterLink>
-        <RouterLink 
+        </div>
+        <div
           v-if="blogStore.services.length > 1"
-          to="/servicios/alquiler-casas" 
           class="circular-button"
           :style="{ backgroundImage: `url(${blogStore.services[1]?.imageUrl || ''})` }"
         >
           <div class="button-overlay"></div>
           <span class="button-text">Alquiler de Casas</span>
-        </RouterLink>
-        <RouterLink 
+        </div>
+        <div
           v-if="blogStore.services.length > 2"
-          to="/servicios/agencias-viajes" 
           class="circular-button"
           :style="{ backgroundImage: `url(${blogStore.services[2]?.imageUrl || ''})` }"
         >
           <div class="button-overlay"></div>
           <span class="button-text">Agencias de Viajes</span>
-        </RouterLink>
+        </div>
       </div>
     </section>
     </div>
