@@ -35,10 +35,11 @@ export interface Event {
 }
 
 export interface Province {
-  id: number
+  id: number | string
   name: string
   slug: string
   icon: string
+  imageUrl?: string
 }
 
 export interface ProvinceInfo {

@@ -143,12 +143,12 @@ const closeMenu = () => {
   display: flex;
   align-items: center;
   text-decoration: none;
-  height: 100px;
+  height: 130px;
   filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.5));
 }
 
 .logo-img {
-  height: 100px;
+  height: 130px;
   width: auto;
   object-fit: contain;
 }
@@ -337,11 +337,11 @@ const closeMenu = () => {
 
 @media (max-width: 1024px) {
   .logo {
-    height: 90px;
+    height: 110px;
   }
-  
+
   .logo-img {
-    height: 90px;
+    height: 110px;
   }
   
   .nav-links {
@@ -361,11 +361,11 @@ const closeMenu = () => {
   }
   
   .logo {
-    height: 70px;
+    height: 85px;
   }
-  
+
   .logo-img {
-    height: 70px;
+    height: 85px;
   }
   
   .nav-links {
@@ -431,11 +431,11 @@ const closeMenu = () => {
   }
   
   .logo {
-    height: 60px;
+    height: 70px;
   }
-  
+
   .logo-img {
-    height: 60px;
+    height: 70px;
   }
   
   .nav-links {

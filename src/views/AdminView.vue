@@ -29,7 +29,27 @@
         <button @click="logout" class="btn-logout">Cerrar Sesión</button>
       </header>
 
-      <div class="admin-content">
+      <!-- Tabs de navegación -->
+      <nav class="admin-tabs">
+        <button
+          class="tab-btn"
+          :class="{ active: activeTab === 'articles' }"
+          @click="activeTab = 'articles'"
+        >Artículos</button>
+        <button
+          class="tab-btn"
+          :class="{ active: activeTab === 'provinces' }"
+          @click="activeTab = 'provinces'"
+        >Provincias</button>
+        <button
+          class="tab-btn"
+          :class="{ active: activeTab === 'events' }"
+          @click="activeTab = 'events'"
+        >Eventos</button>
+      </nav>
+
+      <!-- ===== TAB ARTÍCULOS ===== -->
+      <div v-if="activeTab === 'articles'" class="admin-content">
         <!-- Formulario principal -->
         <main class="admin-main">
           <h2>{{ editingArticle ? 'Editar Artículo' : 'Nuevo Artículo' }}</h2>
@@ -164,10 +184,148 @@
             </div>
           </div>
         </aside>
-      </div>
-    </div>
+      </div><!-- fin tab artículos -->
 
-    <!-- Modal de confirmación de eliminación -->
+      <!-- ===== TAB PROVINCIAS ===== -->
+      <div v-if="activeTab === 'provinces'" class="admin-content">
+        <main class="admin-main">
+          <h2>{{ editingProvince ? 'Editar Provincia' : 'Nueva Provincia' }}</h2>
+          <form @submit.prevent="handleProvinceSubmit" class="article-form">
+            <div class="form-group">
+              <label>Nombre *</label>
+              <input v-model="provinceForm.name" type="text" class="form-input" placeholder="Nombre de la provincia" required />
+            </div>
+            <div class="form-group">
+              <label>Icono (emoji)</label>
+              <input v-model="provinceForm.icon" type="text" class="form-input" placeholder="Ej: 🏝️" />
+            </div>
+            <div class="form-group">
+              <label>Foto de portada</label>
+              <input type="file" accept=".jpg,.jpeg,.png" @change="handleProvinceImageChange" class="form-input" />
+              <small class="form-help">Solo .jpg, .jpeg, .png</small>
+              <div v-if="provinceImagePreview" class="image-preview">
+                <img :src="provinceImagePreview" alt="Preview" />
+              </div>
+              <div v-else-if="editingProvince?.imageUrl" class="current-image">
+                <p>Imagen actual:</p>
+                <img :src="editingProvince.imageUrl" alt="Actual" />
+              </div>
+            </div>
+            <div class="form-actions">
+              <button type="submit" class="btn-primary" :disabled="provinceSubmitting">
+                {{ provinceSubmitting ? 'Guardando...' : (editingProvince ? 'Actualizar' : 'Crear') }}
+              </button>
+              <button v-if="editingProvince" type="button" class="btn-secondary" @click="cancelProvinceEdit">Cancelar</button>
+            </div>
+            <p v-if="provinceError" class="error-message">{{ provinceError }}</p>
+            <p v-if="provinceSuccess" class="success-message">{{ provinceSuccess }}</p>
+          </form>
+        </main>
+
+        <aside class="admin-aside">
+          <h2>Provincias</h2>
+          <div class="articles-list">
+            <div v-if="loadingProvinces" class="loading">Cargando...</div>
+            <div v-else-if="adminProvinces.length === 0" class="no-articles">
+              No hay provincias en Firestore.<br/>
+              <button class="btn-secondary" style="margin-top:1rem" @click="seedProvinces">Importar provincias por defecto</button>
+            </div>
+            <div
+              v-else
+              v-for="prov in adminProvinces"
+              :key="prov.id"
+              class="article-item"
+              :class="{ active: editingProvince?.id === prov.id }"
+            >
+              <div class="article-item-content">
+                <h3>{{ prov.icon }} {{ prov.name }}</h3>
+                <div v-if="prov.imageUrl" class="article-thumbnail">
+                  <img :src="prov.imageUrl" :alt="prov.name" />
+                </div>
+              </div>
+              <div class="article-actions">
+                <button @click="startProvinceEdit(prov)" class="btn-edit">Editar</button>
+                <button @click="confirmProvinceDelete(prov)" class="btn-delete">Eliminar</button>
+              </div>
+            </div>
+          </div>
+        </aside>
+      </div><!-- fin tab provincias -->
+
+      <!-- ===== TAB EVENTOS ===== -->
+      <div v-if="activeTab === 'events'" class="admin-content">
+        <main class="admin-main">
+          <h2>{{ editingEvent ? 'Editar Evento' : 'Nuevo Evento' }}</h2>
+          <form @submit.prevent="handleEventSubmit" class="article-form">
+            <div class="form-group">
+              <label>Título *</label>
+              <input v-model="eventForm.title" type="text" class="form-input" placeholder="Título del evento" required />
+            </div>
+            <div class="form-group">
+              <label>Fecha</label>
+              <input v-model="eventForm.date" type="date" class="form-input" />
+            </div>
+            <div class="form-group">
+              <label>Descripción breve</label>
+              <textarea v-model="eventForm.excerpt" class="form-textarea" rows="3" placeholder="Descripción corta del evento"></textarea>
+            </div>
+            <div class="form-group">
+              <label>Foto</label>
+              <input type="file" accept=".jpg,.jpeg,.png" @change="handleEventImageChange" class="form-input" />
+              <small class="form-help">Solo .jpg, .jpeg, .png</small>
+              <div v-if="eventImagePreview" class="image-preview">
+                <img :src="eventImagePreview" alt="Preview" />
+              </div>
+              <div v-else-if="editingEvent?.imageUrl" class="current-image">
+                <p>Imagen actual:</p>
+                <img :src="editingEvent.imageUrl" alt="Actual" />
+              </div>
+            </div>
+            <div class="form-actions">
+              <button type="submit" class="btn-primary" :disabled="eventSubmitting">
+                {{ eventSubmitting ? 'Guardando...' : (editingEvent ? 'Actualizar' : 'Crear') }}
+              </button>
+              <button v-if="editingEvent" type="button" class="btn-secondary" @click="cancelEventEdit">Cancelar</button>
+            </div>
+            <p v-if="eventError" class="error-message">{{ eventError }}</p>
+            <p v-if="eventSuccess" class="success-message">{{ eventSuccess }}</p>
+          </form>
+        </main>
+
+        <aside class="admin-aside">
+          <h2>Eventos</h2>
+          <div class="articles-list">
+            <div v-if="loadingEvents" class="loading">Cargando...</div>
+            <div v-else-if="adminEvents.length === 0" class="no-articles">
+              No hay eventos aún.<br/>
+              <button class="btn-secondary" style="margin-top:1rem" @click="seedEvents">Importar eventos por defecto</button>
+            </div>
+            <div
+              v-else
+              v-for="ev in adminEvents"
+              :key="ev.id"
+              class="article-item"
+              :class="{ active: editingEvent?.id === ev.id }"
+            >
+              <div class="article-item-content">
+                <h3>{{ ev.title }}</h3>
+                <p class="article-meta"><span class="date">{{ ev.date }}</span></p>
+                <div v-if="ev.imageUrl" class="article-thumbnail">
+                  <img :src="ev.imageUrl" :alt="ev.title" />
+                </div>
+              </div>
+              <div class="article-actions">
+                <button @click="startEventEdit(ev)" class="btn-edit">Editar</button>
+                <button @click="confirmEventDelete(ev)" class="btn-delete">Eliminar</button>
+              </div>
+            </div>
+          </div>
+        </aside>
+      </div><!-- fin tab eventos -->
+
+    </div><!-- fin admin-panel -->
+
+    <!-- Modal eliminar artículo -->
     <div v-if="articleToDelete" class="modal-overlay" @click="cancelDelete">
       <div class="modal-content" @click.stop>
         <h3>¿Eliminar artículo?</h3>
@@ -178,21 +336,64 @@
         </div>
       </div>
     </div>
+
+    <!-- Modal eliminar provincia -->
+    <div v-if="provinceToDelete" class="modal-overlay" @click="provinceToDelete = null">
+      <div class="modal-content" @click.stop>
+        <h3>¿Eliminar provincia?</h3>
+        <p>¿Seguro que quieres eliminar "{{ provinceToDelete.name }}"?</p>
+        <div class="modal-actions">
+          <button @click="handleProvinceDelete" class="btn-delete">Eliminar</button>
+          <button @click="provinceToDelete = null" class="btn-secondary">Cancelar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal eliminar evento -->
+    <div v-if="eventToDelete" class="modal-overlay" @click="eventToDelete = null">
+      <div class="modal-content" @click.stop>
+        <h3>¿Eliminar evento?</h3>
+        <p>¿Seguro que quieres eliminar "{{ eventToDelete.title }}"?</p>
+        <div class="modal-actions">
+          <button @click="handleEventDelete" class="btn-delete">Eliminar</button>
+          <button @click="eventToDelete = null" class="btn-secondary">Cancelar</button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, reactive, onMounted, onUnmounted, watch } from 'vue'
-import { 
-  createArticle, 
-  getAllArticles, 
-  updateArticle, 
+import {
+  createArticle,
+  getAllArticles,
+  updateArticle,
   deleteArticle,
   type ArticleFormData
 } from '../services/articleService'
 import type { Article } from '../services/articleService'
+import {
+  createEvent,
+  getAllEvents,
+  updateEvent,
+  deleteEvent,
+  type FirestoreEvent,
+  type EventFormData
+} from '../services/eventService'
+import {
+  createProvince,
+  getAllProvinces,
+  updateProvince,
+  deleteProvince,
+  type FirestoreProvince,
+  type ProvinceFormData
+} from '../services/provinceService'
 
 const ADMIN_PASSWORD = 'admin'
+
+// --- Tab activo ---
+const activeTab = ref<'articles' | 'provinces' | 'events'>('articles')
 
 const isAuthenticated = ref(false)
 const password = ref('')
@@ -228,9 +429,7 @@ watch(
   }
 )
 
-onUnmounted(() => {
-  if (imagePreview.value) URL.revokeObjectURL(imagePreview.value)
-})
+// El cleanup de imagePreview se hace en el onUnmounted de abajo junto con los demás
 
 const handleLogin = () => {
   if (password.value === ADMIN_PASSWORD) {
@@ -239,6 +438,8 @@ const handleLogin = () => {
     loginError.value = ''
     sessionStorage.setItem('admin_authenticated', 'true')
     loadArticles()
+    loadProvinces()
+    loadEvents()
   } else {
     loginError.value = 'Contraseña incorrecta'
   }
@@ -411,19 +612,248 @@ const handleDeleteArticle = async () => {
 const formatDate = (dateString: string) => {
   if (!dateString) return ''
   const date = new Date(dateString)
-  return date.toLocaleDateString('es-ES', { 
-    year: 'numeric', 
-    month: 'long', 
-    day: 'numeric' 
+  return date.toLocaleDateString('es-ES', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
   })
 }
 
+// =================== PROVINCIAS ===================
+const adminProvinces = ref<FirestoreProvince[]>([])
+const loadingProvinces = ref(false)
+const editingProvince = ref<FirestoreProvince | null>(null)
+const provinceToDelete = ref<FirestoreProvince | null>(null)
+const provinceSubmitting = ref(false)
+const provinceError = ref('')
+const provinceSuccess = ref('')
+const provinceForm = reactive<ProvinceFormData>({ name: '', icon: '', imageFile: undefined, imageUrl: '' })
+const provinceImageFile = ref<File | undefined>()
+const provinceImagePreview = ref('')
+
+watch(provinceImageFile, (newFile) => {
+  if (provinceImagePreview.value) URL.revokeObjectURL(provinceImagePreview.value)
+  provinceImagePreview.value = newFile ? URL.createObjectURL(newFile) : ''
+})
+
+const handleProvinceImageChange = (e: Event) => {
+  const file = (e.target as HTMLInputElement).files?.[0]
+  if (file && ['image/jpeg', 'image/jpg', 'image/png'].includes(file.type)) {
+    provinceImageFile.value = file
+    provinceForm.imageFile = file
+  }
+}
+
+const loadProvinces = async () => {
+  loadingProvinces.value = true
+  try { adminProvinces.value = await getAllProvinces() }
+  catch (e) { console.error(e) }
+  finally { loadingProvinces.value = false }
+}
+
+const startProvinceEdit = (prov: FirestoreProvince) => {
+  editingProvince.value = prov
+  provinceForm.name = prov.name
+  provinceForm.icon = prov.icon
+  provinceForm.imageUrl = prov.imageUrl ?? ''
+  provinceForm.imageFile = undefined
+  provinceImageFile.value = undefined
+  provinceError.value = ''
+  provinceSuccess.value = ''
+}
+
+const cancelProvinceEdit = () => {
+  editingProvince.value = null
+  provinceForm.name = ''
+  provinceForm.icon = ''
+  provinceForm.imageUrl = ''
+  provinceForm.imageFile = undefined
+  provinceImageFile.value = undefined
+  provinceError.value = ''
+  provinceSuccess.value = ''
+}
+
+const handleProvinceSubmit = async () => {
+  provinceSubmitting.value = true
+  provinceError.value = ''
+  provinceSuccess.value = ''
+  try {
+    if (editingProvince.value) {
+      await updateProvince(editingProvince.value.id, provinceForm)
+      provinceSuccess.value = 'Provincia actualizada'
+    } else {
+      await createProvince({ ...provinceForm, order: adminProvinces.value.length })
+      provinceSuccess.value = 'Provincia creada'
+    }
+    cancelProvinceEdit()
+    await loadProvinces()
+    setTimeout(() => { provinceSuccess.value = '' }, 3000)
+  } catch (e: any) {
+    provinceError.value = `Error: ${e.message ?? 'desconocido'}`
+  } finally {
+    provinceSubmitting.value = false
+  }
+}
+
+const confirmProvinceDelete = (prov: FirestoreProvince) => { provinceToDelete.value = prov }
+
+const handleProvinceDelete = async () => {
+  if (!provinceToDelete.value) return
+  try {
+    await deleteProvince(provinceToDelete.value.id)
+    provinceToDelete.value = null
+    await loadProvinces()
+  } catch (e) { console.error(e) }
+}
+
+const DEFAULT_PROVINCES = [
+  { name: 'Annobón', icon: '🏝️', imageUrl: '', order: 0 },
+  { name: 'Bioko Norte', icon: '🏔️', imageUrl: '', order: 1 },
+  { name: 'Bioko Sur', icon: '🌊', imageUrl: '', order: 2 },
+  { name: 'Centro Sur', icon: '🌳', imageUrl: '', order: 3 },
+  { name: 'Kié-Ntem', icon: '🌿', imageUrl: '', order: 4 },
+  { name: 'Litoral', icon: '🏖️', imageUrl: '', order: 5 },
+  { name: 'Wele-Nzas', icon: '🌲', imageUrl: '', order: 6 },
+  { name: 'Djihibilo', icon: '🌄', imageUrl: '', order: 7 }
+]
+
+const seedProvinces = async () => {
+  loadingProvinces.value = true
+  try {
+    for (const p of DEFAULT_PROVINCES) {
+      await createProvince(p)
+    }
+    await loadProvinces()
+  } catch (e) { console.error(e) }
+  finally { loadingProvinces.value = false }
+}
+
+// =================== EVENTOS ===================
+const adminEvents = ref<FirestoreEvent[]>([])
+const loadingEvents = ref(false)
+const editingEvent = ref<FirestoreEvent | null>(null)
+const eventToDelete = ref<FirestoreEvent | null>(null)
+const eventSubmitting = ref(false)
+const eventError = ref('')
+const eventSuccess = ref('')
+const eventForm = reactive<EventFormData>({
+  title: '',
+  date: new Date().toISOString().split('T')[0],
+  excerpt: '',
+  imageFile: undefined,
+  imageUrl: ''
+})
+const eventImageFile = ref<File | undefined>()
+const eventImagePreview = ref('')
+
+watch(eventImageFile, (newFile) => {
+  if (eventImagePreview.value) URL.revokeObjectURL(eventImagePreview.value)
+  eventImagePreview.value = newFile ? URL.createObjectURL(newFile) : ''
+})
+
+const handleEventImageChange = (e: Event) => {
+  const file = (e.target as HTMLInputElement).files?.[0]
+  if (file && ['image/jpeg', 'image/jpg', 'image/png'].includes(file.type)) {
+    eventImageFile.value = file
+    eventForm.imageFile = file
+  }
+}
+
+const loadEvents = async () => {
+  loadingEvents.value = true
+  try { adminEvents.value = await getAllEvents() }
+  catch (e) { console.error(e) }
+  finally { loadingEvents.value = false }
+}
+
+const startEventEdit = (ev: FirestoreEvent) => {
+  editingEvent.value = ev
+  eventForm.title = ev.title
+  eventForm.date = ev.date
+  eventForm.excerpt = ev.excerpt
+  eventForm.imageUrl = ev.imageUrl
+  eventForm.imageFile = undefined
+  eventImageFile.value = undefined
+  eventError.value = ''
+  eventSuccess.value = ''
+}
+
+const cancelEventEdit = () => {
+  editingEvent.value = null
+  eventForm.title = ''
+  eventForm.date = new Date().toISOString().split('T')[0]
+  eventForm.excerpt = ''
+  eventForm.imageUrl = ''
+  eventForm.imageFile = undefined
+  eventImageFile.value = undefined
+  eventError.value = ''
+  eventSuccess.value = ''
+}
+
+const handleEventSubmit = async () => {
+  eventSubmitting.value = true
+  eventError.value = ''
+  eventSuccess.value = ''
+  try {
+    if (editingEvent.value) {
+      await updateEvent(editingEvent.value.id, eventForm)
+      eventSuccess.value = 'Evento actualizado'
+    } else {
+      await createEvent(eventForm)
+      eventSuccess.value = 'Evento creado'
+    }
+    cancelEventEdit()
+    await loadEvents()
+    setTimeout(() => { eventSuccess.value = '' }, 3000)
+  } catch (e: any) {
+    eventError.value = `Error: ${e.message ?? 'desconocido'}`
+  } finally {
+    eventSubmitting.value = false
+  }
+}
+
+const confirmEventDelete = (ev: FirestoreEvent) => { eventToDelete.value = ev }
+
+const handleEventDelete = async () => {
+  if (!eventToDelete.value) return
+  try {
+    await deleteEvent(eventToDelete.value.id)
+    eventToDelete.value = null
+    await loadEvents()
+  } catch (e) { console.error(e) }
+}
+
+const DEFAULT_EVENTS = [
+  { title: 'Musicales', date: '2025-11-15', excerpt: 'Gran festival de música y danza tradicional en Malabo.', imageUrl: 'https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=800&auto=format&fit=crop&q=80' },
+  { title: 'Artísticos', date: '2025-11-20', excerpt: 'Artistas locales exponen sus obras en el Centro Cultural.', imageUrl: 'https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?w=800&auto=format&fit=crop&q=80' },
+  { title: 'Gastronómicos', date: '2025-12-01', excerpt: 'Degustación de platos típicos de todas las regiones.', imageUrl: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=800&auto=format&fit=crop&q=80' },
+  { title: 'Deportivos', date: '2025-12-10', excerpt: 'Competencia deportiva con equipos de todo el país.', imageUrl: 'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=800&auto=format&fit=crop&q=80' }
+]
+
+const seedEvents = async () => {
+  loadingEvents.value = true
+  try {
+    for (const ev of DEFAULT_EVENTS) {
+      await createEvent(ev)
+    }
+    await loadEvents()
+  } catch (e) { console.error(e) }
+  finally { loadingEvents.value = false }
+}
+
+onUnmounted(() => {
+  if (imagePreview.value) URL.revokeObjectURL(imagePreview.value)
+  if (provinceImagePreview.value) URL.revokeObjectURL(provinceImagePreview.value)
+  if (eventImagePreview.value) URL.revokeObjectURL(eventImagePreview.value)
+})
+
 onMounted(() => {
-  // Verificar si ya está autenticado (opcional, usando sessionStorage)
   const storedAuth = sessionStorage.getItem('admin_authenticated')
   if (storedAuth === 'true') {
     isAuthenticated.value = true
     loadArticles()
+    loadProvinces()
+    loadEvents()
   }
 })
 </script>
@@ -874,10 +1304,42 @@ onMounted(() => {
   .admin-content {
     grid-template-columns: 1fr;
   }
-  
+
   .admin-aside {
     position: static;
     max-height: none;
   }
+}
+
+/* Tabs */
+.admin-tabs {
+  display: flex;
+  gap: 0.5rem;
+  padding: 1.5rem 2rem 0;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.tab-btn {
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 0.65rem 1.5rem;
+  border-radius: 999px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
+}
+
+.tab-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+}
+
+.tab-btn.active {
+  background: white;
+  color: #0f172a;
+  border-color: white;
 }
 </style>

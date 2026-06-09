@@ -1,6 +1,8 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import type { Post, Sponsor, Event, Province, Banner, Slide, Service, CulturaArticle, ProvinceInfo } from '../types/blog'
+import { subscribeEvents } from '../services/eventService'
+import { subscribeProvinces } from '../services/provinceService'
 
 export const useBlogStore = defineStore('blog', () => {
   // Banner publicitario
@@ -366,7 +368,8 @@ export const useBlogStore = defineStore('blog', () => {
     { id: 4, name: 'Centro Sur', slug: 'centro-sur', icon: '🌳' },
     { id: 5, name: 'Kié-Ntem', slug: 'kie-ntem', icon: '🌿' },
     { id: 6, name: 'Litoral', slug: 'litoral', icon: '🏖️' },
-    { id: 7, name: 'Wele-Nzas', slug: 'wele-nzas', icon: '🌲' }
+    { id: 7, name: 'Wele-Nzas', slug: 'wele-nzas', icon: '🌲' },
+    { id: 8, name: 'Djihibilo', slug: 'djihibilo', icon: '🌄' }
   ])
 
   // Información detallada de provincias
@@ -1237,6 +1240,32 @@ export const useBlogStore = defineStore('blog', () => {
       .filter(post => post.category === 'general')
       .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
       .slice(0, 3)
+  })
+
+  // Sincronizar eventos y provincias desde Firestore en tiempo real
+  subscribeEvents(firestoreEvents => {
+    if (firestoreEvents.length > 0) {
+      events.value = firestoreEvents.map(e => ({
+        id: e.id as unknown as number,
+        title: e.title,
+        imageUrl: e.imageUrl,
+        slug: e.slug,
+        date: e.date,
+        excerpt: e.excerpt
+      }))
+    }
+  })
+
+  subscribeProvinces(firestoreProvinces => {
+    if (firestoreProvinces.length > 0) {
+      provinces.value = firestoreProvinces.map(p => ({
+        id: p.id as unknown as number,
+        name: p.name,
+        slug: p.slug,
+        icon: p.icon,
+        imageUrl: p.imageUrl
+      }))
+    }
   })
 
   return {

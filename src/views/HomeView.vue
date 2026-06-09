@@ -122,7 +122,7 @@
           class="province-button"
           :style="getProvinceBackground(province)"
         >
-          <div class="province-overlay" v-if="isAnnobon(province) || isBioko(province) || isCentroSur(province) || isKieNtem(province) || isWeleNzas(province) || isLitoral(province)"></div>
+          <div class="province-overlay" v-if="province.imageUrl || isAnnobon(province) || isBioko(province) || isCentroSur(province) || isKieNtem(province) || isWeleNzas(province) || isLitoral(province)"></div>
           <span class="province-text">{{ province.name }}</span>
         </RouterLink>
       </div>
@@ -232,7 +232,6 @@ import portada3Image from '../assets/portad3.jpg'
 import bataImage from '../assets/Bata.jpg'
 import imagenFondoImage from '../assets/imagen-fondo.png'
 import v1Video from '../assets/v1.mp4'
-import v2Video from '../assets/v2.mp4'
 
 const router = useRouter()
 const blogStore = useBlogStore()
@@ -254,7 +253,6 @@ const portadaSlides = computed<Slide[]>(() => [
   {
     id: 2,
     imageUrl: portada2Image,
-    videoUrl: v2Video,
     title: 'Cultura y Tradición',
     subtitle: 'Un legado ancestral vivo',
     link: '/post/cultura-guinea'
@@ -353,48 +351,14 @@ const isLitoral = (province: any) => {
 }
 
 const getProvinceBackground = (province: any) => {
-  if (isAnnobon(province)) {
-    return {
-      backgroundImage: `url(${annobonImage})`,
-      backgroundSize: 'cover',
-      backgroundPosition: 'center'
-    }
-  }
-  if (isBioko(province)) {
-    return {
-      backgroundImage: `url(${biokoImage})`,
-      backgroundSize: 'cover',
-      backgroundPosition: 'center'
-    }
-  }
-  if (isCentroSur(province)) {
-    return {
-      backgroundImage: `url(${centroSurImage})`,
-      backgroundSize: 'cover',
-      backgroundPosition: 'center'
-    }
-  }
-  if (isKieNtem(province)) {
-    return {
-      backgroundImage: `url(${kieNtemImage})`,
-      backgroundSize: 'cover',
-      backgroundPosition: 'center'
-    }
-  }
-  if (isWeleNzas(province)) {
-    return {
-      backgroundImage: `url(${weleNzasImage})`,
-      backgroundSize: 'cover',
-      backgroundPosition: 'center'
-    }
-  }
-  if (isLitoral(province)) {
-    return {
-      backgroundImage: `url(${litoralImage})`,
-      backgroundSize: 'cover',
-      backgroundPosition: 'center'
-    }
-  }
+  const bg = (url: string) => ({ backgroundImage: `url(${url})`, backgroundSize: 'cover', backgroundPosition: 'center' })
+  if (province.imageUrl) return bg(province.imageUrl)
+  if (isAnnobon(province)) return bg(annobonImage)
+  if (isBioko(province)) return bg(biokoImage)
+  if (isCentroSur(province)) return bg(centroSurImage)
+  if (isKieNtem(province)) return bg(kieNtemImage)
+  if (isWeleNzas(province)) return bg(weleNzasImage)
+  if (isLitoral(province)) return bg(litoralImage)
   return {}
 }
 
