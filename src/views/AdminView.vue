@@ -17,7 +17,7 @@
             />
           </div>
           <button type="submit" class="btn-primary">Entrar</button>
-          <p v-if="loginError" class="error-message">{{ loginError }}</p>
+          <p v-if="loginError" class="error-message" role="alert" aria-live="assertive">{{ loginError }}</p>
         </form>
       </div>
     </div>
@@ -145,8 +145,8 @@
               <p class="progress-text">Subiendo imagen: {{ uploadProgress }}%</p>
             </div>
 
-            <p v-if="submitError" class="error-message">{{ submitError }}</p>
-            <p v-if="submitSuccess" class="success-message">{{ submitSuccess }}</p>
+            <p v-if="submitError" class="error-message" role="alert" aria-live="assertive">{{ submitError }}</p>
+            <p v-if="submitSuccess" class="success-message" role="status" aria-live="polite">{{ submitSuccess }}</p>
           </form>
         </main>
 
@@ -217,8 +217,8 @@
               </button>
               <button v-if="editingProvince" type="button" class="btn-secondary" @click="cancelProvinceEdit">Cancelar</button>
             </div>
-            <p v-if="provinceError" class="error-message">{{ provinceError }}</p>
-            <p v-if="provinceSuccess" class="success-message">{{ provinceSuccess }}</p>
+            <p v-if="provinceError" class="error-message" role="alert" aria-live="assertive">{{ provinceError }}</p>
+            <p v-if="provinceSuccess" class="success-message" role="status" aria-live="polite">{{ provinceSuccess }}</p>
           </form>
         </main>
 
@@ -287,8 +287,8 @@
               </button>
               <button v-if="editingEvent" type="button" class="btn-secondary" @click="cancelEventEdit">Cancelar</button>
             </div>
-            <p v-if="eventError" class="error-message">{{ eventError }}</p>
-            <p v-if="eventSuccess" class="success-message">{{ eventSuccess }}</p>
+            <p v-if="eventError" class="error-message" role="alert" aria-live="assertive">{{ eventError }}</p>
+            <p v-if="eventSuccess" class="success-message" role="status" aria-live="polite">{{ eventSuccess }}</p>
           </form>
         </main>
 

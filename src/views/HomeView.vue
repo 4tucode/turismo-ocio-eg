@@ -129,7 +129,7 @@
     </section>
 
     <!-- Sección Blog - Artículos Destacados -->
-    <section class="blog-section section-anchor" id="noticias" data-section="noticias" v-if="firestoreArticles.length > 0">
+    <section class="blog-section section-anchor" id="noticias" data-section="noticias" v-if="firestoreArticles.length > 0 || articlesLoading">
       <button
         class="back-to-top"
         :class="{ show: activeSection === 'noticias' }"
@@ -140,7 +140,21 @@
         📰 Volver arriba
       </button>
       <h2 class="section-title">Artículos Destacados</h2>
-      <TransitionGroup name="articles" tag="div" class="articles-grid">
+      <p class="section-subtitle">Últimas publicaciones de nuestros colaboradores sobre Guinea Ecuatorial</p>
+
+      <!-- Skeleton de carga -->
+      <div v-if="articlesLoading" class="articles-grid" aria-busy="true" aria-label="Cargando artículos">
+        <div v-for="n in 4" :key="n" class="article-card skeleton-card" aria-hidden="true">
+          <div class="skeleton-img"></div>
+          <div class="skeleton-body">
+            <div class="skeleton-line skeleton-line--title"></div>
+            <div class="skeleton-line"></div>
+            <div class="skeleton-line skeleton-line--short"></div>
+          </div>
+        </div>
+      </div>
+
+      <TransitionGroup v-else name="articles" tag="div" class="articles-grid">
         <RouterLink
           v-for="article in paginatedArticles"
           :key="article.id"
@@ -155,6 +169,7 @@
             <p class="article-excerpt">{{ article.excerpt }}</p>
             <div class="article-meta">
               <span class="article-date">{{ formatDate(article.date) }}</span>
+              <span class="article-read-more" aria-hidden="true">Leer →</span>
             </div>
           </div>
         </RouterLink>
@@ -262,6 +277,7 @@ let sectionObserver: IntersectionObserver | null = null
 const sectionRatios = new Map<string, number>()
 
 const firestoreArticles = ref<Article[]>([])
+const articlesLoading = ref(true)
 let unsubscribeArticles: (() => void) | null = null
 
 const ARTICLES_PER_PAGE = 4
@@ -470,6 +486,7 @@ const getEventBackground = (event: any) => {
 onMounted(() => {
   unsubscribeArticles = subscribeAllArticles((articles) => {
     firestoreArticles.value = articles
+    articlesLoading.value = false
   })
 
   sectionObserver = new IntersectionObserver(
@@ -930,9 +947,61 @@ onUnmounted(() => {
 .article-meta {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   font-size: 0.8rem;
   color: #999;
   margin-top: auto;
+}
+
+.article-read-more {
+  color: #667eea;
+  font-weight: 600;
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+
+/* Skeleton artículos home */
+.skeleton-card {
+  pointer-events: none;
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.07);
+}
+
+.skeleton-img {
+  width: 100%;
+  height: 200px;
+  background: linear-gradient(90deg, #e8e8e8 25%, #f5f5f5 50%, #e8e8e8 75%);
+  background-size: 200% 100%;
+  animation: home-shimmer 1.4s infinite;
+}
+
+.skeleton-body {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.skeleton-line {
+  height: 0.8rem;
+  border-radius: 4px;
+  background: linear-gradient(90deg, #e8e8e8 25%, #f5f5f5 50%, #e8e8e8 75%);
+  background-size: 200% 100%;
+  animation: home-shimmer 1.4s infinite;
+}
+
+.skeleton-line--title { height: 1.1rem; width: 85%; }
+.skeleton-line--short { width: 45%; }
+
+@keyframes home-shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton-img, .skeleton-line { animation: none; background: #e8e8e8; }
 }
 
 /* Animación artículos */

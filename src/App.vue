@@ -1,17 +1,18 @@
 
 <template>
   <div id="app">
+    <a href="#main-content" class="skip-link">Saltar al contenido principal</a>
     <header class="header">
-      <nav class="nav">
+      <nav class="nav" aria-label="Navegación principal">
         <RouterLink to="/" class="logo" @click="closeMenu">
-          <img :src="logoImage" alt="Turismo y ocio EG" class="logo-img" />
+          <img :src="logoImage" alt="Turismo y ocio EG - Inicio" class="logo-img" />
         </RouterLink>
 
         <button
           class="nav-toggle"
           type="button"
           :aria-expanded="isMenuOpen"
-          aria-label="Abrir menú"
+          :aria-label="isMenuOpen ? 'Cerrar menú' : 'Abrir menú'"
           @click="toggleMenu"
         >
           <span class="nav-toggle-bar"></span>
@@ -31,7 +32,7 @@
       <div v-if="isMenuOpen" class="nav-backdrop" @click="closeMenu"></div>
     </header>
     
-    <main class="main">
+    <main id="main-content" class="main">
       <RouterView />
     </main>
     
@@ -91,7 +92,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { RouterLink, RouterView } from 'vue-router'
 import logoImage from './assets/logo-sin-fondo.png'
 import bgFooterImage from './assets/bg-footer.png'
@@ -106,9 +107,38 @@ const toggleMenu = () => {
 const closeMenu = () => {
   isMenuOpen.value = false
 }
+
+const handleKeydown = (e: KeyboardEvent) => {
+  if (e.key === 'Escape' && isMenuOpen.value) closeMenu()
+}
+
+onMounted(() => document.addEventListener('keydown', handleKeydown))
+onUnmounted(() => document.removeEventListener('keydown', handleKeydown))
 </script>
 
 <style scoped>
+/* Skip link para teclado/lectores de pantalla */
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: 0.75rem;
+  background: #2c3e50;
+  color: white;
+  padding: 0.6rem 1rem;
+  border-radius: 0 0 8px 8px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  z-index: 9999;
+  text-decoration: none;
+  transition: top 0.15s;
+}
+
+.skip-link:focus {
+  top: 0;
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+
 #app {
   min-height: 100vh;
   display: flex;

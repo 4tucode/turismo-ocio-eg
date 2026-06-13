@@ -1,32 +1,46 @@
 <template>
   <div class="post-view">
-    <div v-if="post" class="post">
+    <!-- Skeleton de carga -->
+    <div v-if="loading" class="post post--skeleton" aria-busy="true" aria-label="Cargando artículo">
+      <div class="skeleton-back"></div>
+      <article class="post-article">
+        <div class="skeleton-hero"></div>
+        <div class="skeleton-body">
+          <div class="skeleton-line skeleton-line--h1"></div>
+          <div class="skeleton-line skeleton-line--meta"></div>
+          <div class="skeleton-line"></div>
+          <div class="skeleton-line"></div>
+          <div class="skeleton-line skeleton-line--short"></div>
+          <div class="skeleton-line"></div>
+          <div class="skeleton-line skeleton-line--short"></div>
+        </div>
+      </article>
+    </div>
+
+    <!-- Artículo cargado -->
+    <div v-else-if="post" class="post">
       <RouterLink to="/" class="back-link">← Volver al inicio</RouterLink>
-      
+
       <article class="post-article">
         <div v-if="post.imageUrl" class="post-hero-image">
           <img :src="post.imageUrl" :alt="post.title" />
         </div>
-        
+
         <h1>{{ post.title }}</h1>
-        
+
         <div class="post-meta">
           <span class="date">{{ formatDate(post.date) }}</span>
-          <span class="separator">•</span>
+          <span class="separator" aria-hidden="true">•</span>
           <span class="category">{{ formatCategory(post.category) }}</span>
+          <span class="separator" aria-hidden="true">•</span>
+          <span class="reading-time">{{ readingTime }} min de lectura</span>
         </div>
-        <div class="post-divider"></div>
+        <div class="post-divider" role="separator"></div>
         <div class="post-content" v-html="post.content"></div>
-        
-        <div class="tags" v-if="post.tags?.length">
-          <span v-for="tag in post.tags" :key="tag" class="tag">{{ tag }}</span>
-        </div>
       </article>
     </div>
-    
-    <div v-else-if="loading" class="not-found">
-      <p>Cargando...</p>
-    </div>
+
+    <!-- No encontrado -->
     <div v-else class="not-found">
       <h2>Post no encontrado</h2>
       <p>Lo sentimos, el post que buscas no existe.</p>
@@ -36,7 +50,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRoute, RouterLink } from 'vue-router'
 import { subscribeArticleBySlug, type Article } from '../services/articleService'
 
@@ -45,6 +59,12 @@ const route = useRoute()
 const post = ref<Article | null>(null)
 const loading = ref(true)
 let unsubscribe: (() => void) | null = null
+
+const readingTime = computed(() => {
+  if (!post.value?.content) return 1
+  const words = post.value.content.replace(/<[^>]+>/g, '').split(/\s+/).length
+  return Math.max(1, Math.ceil(words / 200))
+})
 
 onMounted(() => {
   unsubscribe = subscribeArticleBySlug(
@@ -74,7 +94,14 @@ const formatDate = (dateString: string) => {
 
 const formatCategory = (category?: string) => {
   if (!category) return ''
-  return category.charAt(0).toUpperCase() + category.slice(1)
+  const labels: Record<string, string> = {
+    cultura: 'Cultura e Historia',
+    gastronomia: 'Gastronomía',
+    naturaleza: 'Naturaleza',
+    ocio: 'Ocio',
+    noticias: 'Noticias'
+  }
+  return labels[category] ?? (category.charAt(0).toUpperCase() + category.slice(1))
 }
 </script>
 
@@ -84,6 +111,7 @@ const formatCategory = (category?: string) => {
   max-width: 980px;
   margin: 0 auto;
   padding-top: 140px;
+  padding-bottom: 4rem;
 }
 
 .back-link {
@@ -91,24 +119,26 @@ const formatCategory = (category?: string) => {
   color: #42b983;
   text-decoration: none;
   margin-bottom: 2rem;
-  transition: color 0.3s;
+  font-weight: 500;
+  transition: color 0.2s;
 }
 
-.back-link:hover {
+.back-link:hover,
+.back-link:focus-visible {
   color: #35a372;
+  text-decoration: underline;
 }
 
 .post-article {
   background: white;
-  border-radius: 8px;
-  padding: 2rem;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.09);
 }
 
 .post-hero-image {
   width: 100%;
-  height: 400px;
-  border-radius: 8px 8px 0 0;
+  height: 420px;
   overflow: hidden;
 }
 
@@ -120,47 +150,41 @@ const formatCategory = (category?: string) => {
 
 .post-article h1 {
   color: #2c3e50;
-  margin: 0 0 1rem 0;
-  font-size: 2.5rem;
+  margin: 1.75rem 2rem 0.75rem;
+  font-size: 2.25rem;
+  line-height: 1.25;
 }
 
 .post-meta {
   display: flex;
-  gap: 0.5rem;
-  margin-bottom: 0.75rem;
+  flex-wrap: wrap;
+  gap: 0.4rem 0.75rem;
+  margin: 0 2rem 0.75rem;
   color: #64748b;
   font-size: 0.875rem;
+  align-items: center;
+}
+
+.reading-time {
+  color: #94a3b8;
 }
 
 .post-divider {
   height: 1px;
   background: #e2e8f0;
-  margin: 1rem 0 1.5rem;
-}
-
-.tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-top: 2rem;
-}
-
-.tag {
-  background: #e8f4f8;
-  color: #2c3e50;
-  padding: 0.25rem 0.75rem;
-  border-radius: 12px;
-  font-size: 0.75rem;
+  margin: 0 2rem 1.5rem;
 }
 
 .post-content {
   color: #333;
-  line-height: 1.8;
+  line-height: 1.85;
+  padding: 0 2rem 2.5rem;
+  font-size: 1.05rem;
 }
 
 .post-content :deep(h2) {
   color: #2c3e50;
-  margin: 1.5rem 0 0.75rem;
+  margin: 2rem 0 0.75rem;
   font-size: 1.5rem;
 }
 
@@ -169,38 +193,115 @@ const formatCategory = (category?: string) => {
 .post-content :deep(h5),
 .post-content :deep(h6) {
   color: #2c3e50;
-  margin: 1rem 0 0.5rem;
-  font-size: 1.15rem;
-  font-weight: 600;
+  margin: 1.5rem 0 0.5rem;
+  font-weight: 700;
 }
 
-.post-content :deep(p) {
-  margin-bottom: 1rem;
+.post-content :deep(p) { margin-bottom: 1.1rem; }
+
+.post-content :deep(img) {
+  max-width: 100%;
+  border-radius: 8px;
+  margin: 1rem 0;
+}
+
+.post-content :deep(a) {
+  color: #42b983;
+  text-underline-offset: 3px;
+}
+
+/* Skeleton */
+.post--skeleton {
+  pointer-events: none;
+}
+
+.skeleton-back {
+  height: 1.2rem;
+  width: 120px;
+  border-radius: 6px;
+  background: linear-gradient(90deg, #e8e8e8 25%, #f5f5f5 50%, #e8e8e8 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+  margin-bottom: 2rem;
+}
+
+.skeleton-hero {
+  width: 100%;
+  height: 420px;
+  background: linear-gradient(90deg, #e8e8e8 25%, #f5f5f5 50%, #e8e8e8 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+}
+
+.skeleton-body {
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.skeleton-line {
+  height: 0.9rem;
+  border-radius: 4px;
+  background: linear-gradient(90deg, #e8e8e8 25%, #f5f5f5 50%, #e8e8e8 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+}
+
+.skeleton-line--h1 { height: 2rem; width: 75%; }
+.skeleton-line--meta { height: 0.75rem; width: 50%; }
+.skeleton-line--short { width: 60%; }
+
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
 }
 
 .not-found {
   text-align: center;
-  padding: 3rem;
+  padding: 4rem 2rem;
 }
 
 .not-found h2 {
   color: #2c3e50;
   margin-bottom: 1rem;
+  font-size: 1.75rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton-back,
+  .skeleton-hero,
+  .skeleton-line {
+    animation: none;
+    background: #e8e8e8;
+  }
 }
 
 @media (max-width: 768px) {
   .post-view {
     width: 100%;
-    padding: 120px 1rem 0;
+    padding: 120px 1rem 2rem;
   }
 
   .post-article h1 {
-    font-size: 2rem;
+    font-size: 1.75rem;
+    margin: 1.25rem 1.25rem 0.5rem;
   }
-  
-  .post-hero-image {
-    height: 250px;
+
+  .post-meta,
+  .post-divider,
+  .post-content {
+    margin-left: 1.25rem;
+    margin-right: 1.25rem;
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .post-content { padding-bottom: 2rem; }
+
+  .post-hero-image,
+  .skeleton-hero {
+    height: 260px;
   }
 }
 </style>
-
