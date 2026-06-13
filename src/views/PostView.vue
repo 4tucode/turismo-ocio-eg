@@ -24,6 +24,9 @@
       </article>
     </div>
     
+    <div v-else-if="loading" class="not-found">
+      <p>Cargando...</p>
+    </div>
     <div v-else class="not-found">
       <h2>Post no encontrado</h2>
       <p>Lo sentimos, el post que buscas no existe.</p>
@@ -33,23 +36,39 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { useRoute, RouterLink } from 'vue-router'
-import { useBlogStore } from '../stores/blog'
+import { subscribeArticleBySlug, type Article } from '../services/articleService'
 
 const route = useRoute()
-const blogStore = useBlogStore()
 
-const post = computed(() => {
-  return blogStore.getPostBySlug(route.params.slug as string)
+const post = ref<Article | null>(null)
+const loading = ref(true)
+let unsubscribe: (() => void) | null = null
+
+onMounted(() => {
+  unsubscribe = subscribeArticleBySlug(
+    route.params.slug as string,
+    (article) => {
+      post.value = article
+      loading.value = false
+    },
+    () => { loading.value = false }
+  )
+})
+
+onUnmounted(() => {
+  unsubscribe?.()
 })
 
 const formatDate = (dateString: string) => {
+  if (!dateString) return ''
   const date = new Date(dateString)
-  return date.toLocaleDateString('es-ES', { 
-    year: 'numeric', 
-    month: 'long', 
-    day: 'numeric' 
+  if (isNaN(date.getTime())) return dateString
+  return date.toLocaleDateString('es-ES', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
   })
 }
 

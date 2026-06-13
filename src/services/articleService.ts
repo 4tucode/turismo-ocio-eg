@@ -238,6 +238,45 @@ const mapArticle = (docSnap: any): Article => {
   }
 }
 
+export function subscribeAllArticles(
+  onUpdate: (articles: Article[]) => void,
+  onError?: (error: any) => void
+): () => void {
+  let unsubscribe = () => {}
+
+  const subscribeWith = (useOrder: boolean) => {
+    const q = useOrder
+      ? query(collection(db, 'posts'), orderBy('createdAt', 'desc'))
+      : collection(db, 'posts')
+
+    unsubscribe = onSnapshot(
+      q,
+      (snapshot) => {
+        const articles = snapshot.docs.map(mapArticle)
+        if (!useOrder) {
+          articles.sort((a, b) => {
+            const aTime = a.createdAt?.toMillis?.() || 0
+            const bTime = b.createdAt?.toMillis?.() || 0
+            return bTime - aTime
+          })
+        }
+        onUpdate(articles)
+      },
+      (error) => {
+        if (useOrder && error?.code === 'failed-precondition') {
+          unsubscribe()
+          subscribeWith(false)
+          return
+        }
+        if (onError) onError(error)
+      }
+    )
+  }
+
+  subscribeWith(true)
+  return () => unsubscribe()
+}
+
 export function subscribeArticlesByCategory(
   category: string,
   onUpdate: (articles: Article[]) => void,

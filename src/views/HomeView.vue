@@ -129,7 +129,7 @@
     </section>
 
     <!-- Sección Blog - Artículos Destacados -->
-    <section class="blog-section section-anchor" id="noticias" data-section="noticias" v-if="blogStore.featuredPosts.length > 0">
+    <section class="blog-section section-anchor" id="noticias" data-section="noticias" v-if="firestoreArticles.length > 0">
       <button
         class="back-to-top"
         :class="{ show: activeSection === 'noticias' }"
@@ -140,9 +140,9 @@
         📰 Volver arriba
       </button>
       <h2 class="section-title">Artículos Destacados</h2>
-      <div class="articles-grid">
+      <TransitionGroup name="articles" tag="div" class="articles-grid">
         <RouterLink
-          v-for="article in blogStore.featuredPosts"
+          v-for="article in paginatedArticles"
           :key="article.id"
           :to="`/post/${article.slug}`"
           class="article-card"
@@ -155,10 +155,30 @@
             <p class="article-excerpt">{{ article.excerpt }}</p>
             <div class="article-meta">
               <span class="article-date">{{ formatDate(article.date) }}</span>
-              <span class="article-author">{{ article.author }}</span>
             </div>
           </div>
         </RouterLink>
+      </TransitionGroup>
+      <div class="pagination" v-if="totalPages > 1">
+        <button
+          class="pagination-btn"
+          :disabled="currentPage === 0"
+          @click="goToPage(currentPage - 1)"
+          aria-label="Página anterior"
+        >&#8592;</button>
+        <button
+          v-for="page in totalPages"
+          :key="page"
+          class="pagination-btn pagination-num"
+          :class="{ active: currentPage === page - 1 }"
+          @click="goToPage(page - 1)"
+        >{{ page }}</button>
+        <button
+          class="pagination-btn"
+          :disabled="currentPage === totalPages - 1"
+          @click="goToPage(currentPage + 1)"
+          aria-label="Página siguiente"
+        >&#8594;</button>
       </div>
     </section>
 
@@ -212,6 +232,7 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter, RouterLink } from 'vue-router'
 import { useBlogStore } from '../stores/blog'
+import { subscribeAllArticles, type Article } from '../services/articleService'
 import AdBanner from '../components/AdBanner.vue'
 import HeroSlider from '../components/HeroSlider.vue'
 import type { Slide } from '../types/blog'
@@ -239,6 +260,20 @@ const searchQuery = ref('')
 const activeSection = ref<string | null>(null)
 let sectionObserver: IntersectionObserver | null = null
 const sectionRatios = new Map<string, number>()
+
+const firestoreArticles = ref<Article[]>([])
+let unsubscribeArticles: (() => void) | null = null
+
+const ARTICLES_PER_PAGE = 4
+const currentPage = ref(0)
+const totalPages = computed(() => Math.ceil(firestoreArticles.value.length / ARTICLES_PER_PAGE))
+const paginatedArticles = computed(() =>
+  firestoreArticles.value.slice(currentPage.value * ARTICLES_PER_PAGE, (currentPage.value + 1) * ARTICLES_PER_PAGE)
+)
+
+const goToPage = (page: number) => {
+  currentPage.value = page
+}
 
 // Slides de portada con vídeos de fondo (v1, v2) y textos
 const portadaSlides = computed<Slide[]>(() => [
@@ -433,6 +468,10 @@ const getEventBackground = (event: any) => {
 }
 
 onMounted(() => {
+  unsubscribeArticles = subscribeAllArticles((articles) => {
+    firestoreArticles.value = articles
+  })
+
   sectionObserver = new IntersectionObserver(
     (entries) => {
       entries.forEach((entry) => {
@@ -460,6 +499,8 @@ onMounted(() => {
 })
 
 onUnmounted(() => {
+  unsubscribeArticles?.()
+  unsubscribeArticles = null
   sectionObserver?.disconnect()
   sectionObserver = null
   sectionRatios.clear()
@@ -892,6 +933,65 @@ onUnmounted(() => {
   font-size: 0.8rem;
   color: #999;
   margin-top: auto;
+}
+
+/* Animación artículos */
+.articles-enter-active {
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+.articles-leave-active {
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+.articles-enter-from {
+  opacity: 0;
+  transform: translateY(20px);
+}
+.articles-leave-to {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+.articles-move {
+  transition: transform 0.4s ease;
+}
+
+/* Paginación */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 2.5rem;
+}
+
+.pagination-btn {
+  min-width: 2.5rem;
+  height: 2.5rem;
+  padding: 0 0.75rem;
+  border: 2px solid #d1d5db;
+  border-radius: 8px;
+  background: white;
+  color: #374151;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s, color 0.2s, transform 0.15s;
+}
+
+.pagination-btn:hover:not(:disabled):not(.active) {
+  background: #f3f4f6;
+  border-color: #9ca3af;
+  transform: scale(1.05);
+}
+
+.pagination-btn.active {
+  background: #2c3e50;
+  border-color: #2c3e50;
+  color: white;
+}
+
+.pagination-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
 }
 
 /* Responsive */
