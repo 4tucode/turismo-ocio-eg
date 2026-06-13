@@ -155,9 +155,11 @@ onUnmounted(() => document.removeEventListener('keydown', handleKeydown))
   z-index: 10;
   top: 0;
   left: 0;
+  pointer-events: none;
 }
 
 .nav {
+  pointer-events: auto;
   /* max-width: 1200px; */
   margin: 0 auto;
   width: 100%;
@@ -225,6 +227,7 @@ onUnmounted(() => document.removeEventListener('keydown', handleKeydown))
 
 .nav-backdrop {
   display: none;
+  pointer-events: auto;
 }
 
 .nav-links a {

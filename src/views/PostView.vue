@@ -211,6 +211,65 @@ const formatCategory = (category?: string) => {
 
 .post-content :deep(p) { margin-bottom: 1.1rem; }
 
+.post-content :deep(ul),
+.post-content :deep(ol) {
+  margin: 1rem 0 1.25rem;
+  padding-left: 1.75rem;
+}
+
+.post-content :deep(ul) { list-style: disc; }
+.post-content :deep(ol) { list-style: decimal; }
+
+.post-content :deep(li) {
+  margin: 0.4rem 0;
+  line-height: 1.7;
+}
+
+.post-content :deep(li > ul),
+.post-content :deep(li > ol) {
+  margin: 0.25rem 0;
+}
+
+.post-content :deep(blockquote) {
+  border-left: 4px solid #42b983;
+  margin: 1.25rem 0;
+  padding: 0.5rem 1.25rem;
+  color: #555;
+  font-style: italic;
+  background: #f8fffe;
+  border-radius: 0 8px 8px 0;
+}
+
+.post-content :deep(pre) {
+  background: #1e2433;
+  color: #e2e8f0;
+  padding: 1.25rem;
+  border-radius: 8px;
+  overflow-x: auto;
+  margin: 1.25rem 0;
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.post-content :deep(code) {
+  background: #f0f4ff;
+  color: #5a3fc0;
+  padding: 0.15em 0.4em;
+  border-radius: 4px;
+  font-size: 0.88em;
+}
+
+.post-content :deep(pre code) {
+  background: none;
+  color: inherit;
+  padding: 0;
+  border-radius: 0;
+  font-size: inherit;
+}
+
+.post-content :deep(strong) { font-weight: 700; color: #1e293b; }
+.post-content :deep(em)     { font-style: italic; }
+
 .post-content :deep(img) {
   max-width: 100%;
   border-radius: 8px;

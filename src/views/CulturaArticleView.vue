@@ -1,7 +1,7 @@
 <template>
   <div class="cultura-article">
     <div v-if="article" class="article-container">
-      <RouterLink :to="getBackLink()" class="back-link">← Volver</RouterLink>
+      <button class="back-link" @click="goBack">← Volver</button>
       <nav class="breadcrumbs" aria-label="Migas de pan">
         <RouterLink to="/" class="breadcrumb-link">Inicio</RouterLink>
         <span class="breadcrumb-separator">/</span>
@@ -40,13 +40,22 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
-import { useRoute, RouterLink } from 'vue-router'
+import { ref, onMounted, onUnmounted, watch } from 'vue'
+import { useRoute, useRouter, RouterLink } from 'vue-router'
 import type { Article } from '../services/articleService'
 import { subscribeArticleBySlug } from '../services/articleService'
 
 const route = useRoute()
+const router = useRouter()
 const article = ref<Article | null>(null)
+
+const goBack = () => {
+  if (window.history.length > 1) {
+    router.back()
+  } else {
+    router.push(getBackLink())
+  }
+}
 let unsubscribe: (() => void) | null = null
 
 const subscribeToArticle = (slug: string) => {
@@ -122,15 +131,21 @@ const formatCategory = (category?: string) => {
 
 .back-link {
   display: inline-block;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
   color: #667eea;
   text-decoration: none;
   font-weight: 500;
+  font-size: 1rem;
   margin-bottom: 2rem;
   transition: color 0.3s;
 }
 
 .back-link:hover {
   color: #764ba2;
+  text-decoration: underline;
 }
 
 .breadcrumbs {
@@ -169,15 +184,13 @@ const formatCategory = (category?: string) => {
 
 .article-hero-image {
   width: 100%;
-  height: 400px;
-  overflow: hidden;
   background: #e0e0e0;
 }
 
 .article-hero-image img {
   width: 100%;
-  height: 100%;
-  object-fit: cover;
+  height: auto;
+  display: block;
 }
 
 .article-header {
@@ -303,10 +316,6 @@ const formatCategory = (category?: string) => {
 
   .article-title {
     font-size: 1.75rem;
-  }
-
-  .article-hero-image {
-    height: 250px;
   }
 
   .article-body {

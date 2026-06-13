@@ -96,15 +96,58 @@
             </div>
 
             <div class="form-group">
-              <label for="content">Cuerpo del Artículo *</label>
-              <textarea
-                id="content"
-                v-model="formData.content"
-                class="form-textarea"
-                rows="10"
-                placeholder="Escribe el contenido del artículo aquí..."
-                required
-              ></textarea>
+              <label>Cuerpo del Artículo *</label>
+              <div class="editor-wrapper">
+                <!-- Barra de herramientas -->
+                <div class="editor-toolbar" role="toolbar" aria-label="Herramientas de texto">
+                  <button type="button" class="tool-btn" :class="{ active: editor?.isActive('bold') }"
+                    @click="editor?.chain().focus().toggleBold().run()" title="Negrita">
+                    <strong>B</strong>
+                  </button>
+                  <button type="button" class="tool-btn" :class="{ active: editor?.isActive('italic') }"
+                    @click="editor?.chain().focus().toggleItalic().run()" title="Cursiva">
+                    <em>I</em>
+                  </button>
+                  <span class="tool-sep"></span>
+                  <button type="button" class="tool-btn" :class="{ active: editor?.isActive('heading', { level: 2 }) }"
+                    @click="editor?.chain().focus().toggleHeading({ level: 2 }).run()" title="Título 2">
+                    H2
+                  </button>
+                  <button type="button" class="tool-btn" :class="{ active: editor?.isActive('heading', { level: 3 }) }"
+                    @click="editor?.chain().focus().toggleHeading({ level: 3 }).run()" title="Título 3">
+                    H3
+                  </button>
+                  <span class="tool-sep"></span>
+                  <button type="button" class="tool-btn" :class="{ active: editor?.isActive('bulletList') }"
+                    @click="editor?.chain().focus().toggleBulletList().run()" title="Lista con viñetas">
+                    ≡
+                  </button>
+                  <button type="button" class="tool-btn" :class="{ active: editor?.isActive('orderedList') }"
+                    @click="editor?.chain().focus().toggleOrderedList().run()" title="Lista numerada">
+                    1.
+                  </button>
+                  <span class="tool-sep"></span>
+                  <button type="button" class="tool-btn" :class="{ active: editor?.isActive('blockquote') }"
+                    @click="editor?.chain().focus().toggleBlockquote().run()" title="Cita">
+                    "
+                  </button>
+                  <button type="button" class="tool-btn" :class="{ active: editor?.isActive('code') }"
+                    @click="editor?.chain().focus().toggleCode().run()" title="Código">
+                    &lt;/&gt;
+                  </button>
+                  <span class="tool-sep"></span>
+                  <button type="button" class="tool-btn"
+                    @click="editor?.chain().focus().undo().run()" title="Deshacer">
+                    ↩
+                  </button>
+                  <button type="button" class="tool-btn"
+                    @click="editor?.chain().focus().redo().run()" title="Rehacer">
+                    ↪
+                  </button>
+                </div>
+                <!-- Área de edición -->
+                <EditorContent :editor="editor" class="editor-content" />
+              </div>
             </div>
 
             <div class="form-group">
@@ -380,6 +423,9 @@
 
 <script setup lang="ts">
 import { ref, reactive, onMounted, onUnmounted, watch } from 'vue'
+import { useEditor, EditorContent } from '@tiptap/vue-3'
+import StarterKit from '@tiptap/starter-kit'
+import Placeholder from '@tiptap/extension-placeholder'
 import {
   createArticle,
   getAllArticles,
@@ -420,6 +466,17 @@ const formData = reactive<ArticleFormData>({
   date: new Date().toISOString().split('T')[0],
   content: '',
   imageFile: undefined
+})
+
+const editor = useEditor({
+  extensions: [
+    StarterKit,
+    Placeholder.configure({ placeholder: 'Escribe el contenido del artículo aquí...' })
+  ],
+  content: '',
+  onUpdate({ editor: e }) {
+    formData.content = e.getHTML()
+  }
 })
 
 const editingArticle = ref<Article | null>(null)
@@ -490,6 +547,7 @@ const resetForm = () => {
   editingArticle.value = null
   submitError.value = ''
   submitSuccess.value = ''
+  editor.value?.commands.setContent('')
 }
 
 const handleSubmit = async () => {
@@ -587,8 +645,8 @@ const editArticle = (article: Article) => {
   formData.date = article.date || new Date().toISOString().split('T')[0]
   formData.content = article.content
   formData.imageFile = undefined
-  
-  // Scroll al formulario
+  editor.value?.commands.setContent(article.content || '')
+
   document.querySelector('.admin-main')?.scrollIntoView({ behavior: 'smooth' })
 }
 
@@ -895,6 +953,7 @@ onUnmounted(() => {
   if (imagePreview.value) URL.revokeObjectURL(imagePreview.value)
   if (provinceImagePreview.value) URL.revokeObjectURL(provinceImagePreview.value)
   if (eventImagePreview.value) URL.revokeObjectURL(eventImagePreview.value)
+  editor.value?.destroy()
 })
 
 onMounted(() => {
@@ -1066,6 +1125,115 @@ onMounted(() => {
 .form-textarea {
   resize: vertical;
   min-height: 200px;
+}
+
+/* Rich text editor */
+.editor-wrapper {
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  border-radius: 12px;
+  overflow: hidden;
+  background: #f8fafc;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.editor-wrapper:focus-within {
+  border-color: #4f46e5;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+}
+
+.editor-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.3);
+  background: #f1f5f9;
+  flex-wrap: wrap;
+}
+
+.tool-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2rem;
+  height: 2rem;
+  padding: 0 0.4rem;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: none;
+  color: #475569;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  font-family: inherit;
+}
+
+.tool-btn:hover {
+  background: #e2e8f0;
+  color: #1e293b;
+}
+
+.tool-btn.active {
+  background: #4f46e5;
+  color: white;
+  border-color: #4f46e5;
+}
+
+.tool-sep {
+  width: 1px;
+  height: 1.25rem;
+  background: rgba(148, 163, 184, 0.5);
+  margin: 0 0.25rem;
+  flex-shrink: 0;
+}
+
+.editor-content {
+  min-height: 220px;
+  padding: 1rem 1.25rem;
+  font-size: 1rem;
+  line-height: 1.7;
+  color: #1e293b;
+  cursor: text;
+}
+
+.editor-content :deep(.tiptap) {
+  min-height: 200px;
+  outline: none;
+}
+
+.editor-content :deep(.tiptap p.is-editor-empty:first-child::before) {
+  content: attr(data-placeholder);
+  color: #94a3b8;
+  pointer-events: none;
+  float: left;
+  height: 0;
+}
+
+.editor-content :deep(h2) { font-size: 1.4rem; font-weight: 700; margin: 1rem 0 0.5rem; color: #1e293b; }
+.editor-content :deep(h3) { font-size: 1.15rem; font-weight: 700; margin: 0.75rem 0 0.4rem; color: #1e293b; }
+.editor-content :deep(p)  { margin: 0.5rem 0; }
+.editor-content :deep(ul),
+.editor-content :deep(ol) { padding-left: 1.5rem; margin: 0.5rem 0; }
+.editor-content :deep(ul) { list-style: disc; }
+.editor-content :deep(ol) { list-style: decimal; }
+.editor-content :deep(li) { margin: 0.25rem 0; }
+.editor-content :deep(strong) { font-weight: 700; }
+.editor-content :deep(em) { font-style: italic; }
+.editor-content :deep(blockquote) {
+  border-left: 3px solid #4f46e5;
+  margin: 0.5rem 0;
+  padding: 0.25rem 1rem;
+  color: #64748b;
+  font-style: italic;
+}
+.editor-content :deep(code) {
+  background: #e8f0fe;
+  color: #4f46e5;
+  padding: 0.1em 0.35em;
+  border-radius: 4px;
+  font-size: 0.875em;
+  font-family: monospace;
 }
 
 .form-help {
