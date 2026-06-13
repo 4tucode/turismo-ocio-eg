@@ -890,23 +890,6 @@ const seedEvents = async () => {
   }
 }
 
-const DEFAULT_EVENTS = [
-  { title: 'Musicales', date: '2025-11-15', excerpt: 'Gran festival de música y danza tradicional en Malabo.', imageUrl: 'https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=800&auto=format&fit=crop&q=80' },
-  { title: 'Artísticos', date: '2025-11-20', excerpt: 'Artistas locales exponen sus obras en el Centro Cultural.', imageUrl: 'https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?w=800&auto=format&fit=crop&q=80' },
-  { title: 'Gastronómicos', date: '2025-12-01', excerpt: 'Degustación de platos típicos de todas las regiones.', imageUrl: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=800&auto=format&fit=crop&q=80' },
-  { title: 'Deportivos', date: '2025-12-10', excerpt: 'Competencia deportiva con equipos de todo el país.', imageUrl: 'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=800&auto=format&fit=crop&q=80' }
-]
-
-const seedEvents = async () => {
-  loadingEvents.value = true
-  try {
-    for (const ev of DEFAULT_EVENTS) {
-      await createEvent(ev)
-    }
-    await loadEvents()
-  } catch (e) { console.error(e) }
-  finally { loadingEvents.value = false }
-}
 
 onUnmounted(() => {
   if (imagePreview.value) URL.revokeObjectURL(imagePreview.value)
