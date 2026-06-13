@@ -40,23 +40,14 @@
 
     <!-- Controles de navegación -->
     <button class="slider-arrow slider-arrow--prev" @click="prevSlide" aria-label="Diapositiva anterior">
-      &#8249;
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
     </button>
     <button class="slider-arrow slider-arrow--next" @click="nextSlide" aria-label="Diapositiva siguiente">
-      &#8250;
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
     </button>
 
-    <!-- Indicadores de posición y botón pausa -->
-    <div class="slider-footer" role="group" aria-label="Controles del carrusel">
-      <button
-        class="slider-pause"
-        @click="togglePause"
-        :aria-label="isPaused ? 'Reanudar carrusel' : 'Pausar carrusel'"
-        :title="isPaused ? 'Reanudar' : 'Pausar'"
-      >
-        <span v-if="isPaused" aria-hidden="true">▶</span>
-        <span v-else aria-hidden="true">⏸</span>
-      </button>
+    <!-- Indicadores de posición -->
+    <div class="slider-footer" role="group" aria-label="Indicadores de diapositiva">
       <div class="slider-dots" role="tablist" aria-label="Diapositivas">
         <button
           v-for="(slide, index) in slides"
@@ -83,7 +74,6 @@ const props = defineProps<{
 
 const currentSlide = ref(0)
 const videoRefs = ref<(HTMLVideoElement | null)[]>([])
-const isPaused = ref(false)
 let intervalId: number | null = null
 
 const setVideoRef = (el: unknown, index: number) => {
@@ -120,7 +110,6 @@ const goToSlide = (index: number) => {
 }
 
 const startAutoplay = () => {
-  if (isPaused.value) return
   stopAutoplay()
   intervalId = window.setInterval(nextSlide, 5000)
 }
@@ -129,15 +118,6 @@ const stopAutoplay = () => {
   if (intervalId) {
     clearInterval(intervalId)
     intervalId = null
-  }
-}
-
-const togglePause = () => {
-  isPaused.value = !isPaused.value
-  if (isPaused.value) {
-    stopAutoplay()
-  } else {
-    startAutoplay()
   }
 }
 
@@ -241,52 +221,19 @@ onUnmounted(() => {
   top: 50%;
   transform: translateY(-50%);
   z-index: 3;
-  background: rgba(0,0,0,0.35);
+  background: rgba(0,0,0,0.4);
   color: white;
-  border: 2px solid rgba(255,255,255,0.5);
+  border: none;
+  outline: none;
+  box-shadow: none;
   border-radius: 50%;
   width: 3rem;
   height: 3rem;
-  font-size: 1.75rem;
-  line-height: 1;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background 0.2s, transform 0.2s;
-  backdrop-filter: blur(4px);
-}
-
-.slider-arrow:hover,
-.slider-arrow:focus-visible {
-  background: rgba(0,0,0,0.65);
-  outline: 2px solid white;
-  outline-offset: 2px;
-}
-
-.slider-arrow--prev { left: 1.25rem; }
-.slider-arrow--next { right: 1.25rem; }
-
-/* Footer: pausa + dots */
-.slider-footer {
-  position: absolute;
-  bottom: 1.5rem;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  z-index: 3;
-}
-
-.slider-pause {
-  background: rgba(0,0,0,0.4);
-  color: white;
-  border: 1px solid rgba(255,255,255,0.5);
-  border-radius: 50%;
-  width: 2rem;
-  height: 2rem;
-  font-size: 0.75rem;
+  min-width: 3rem;
+  min-height: 3rem;
+  padding: 0;
+  box-sizing: border-box;
+  aspect-ratio: 1 / 1;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -294,13 +241,33 @@ onUnmounted(() => {
   transition: background 0.2s;
   backdrop-filter: blur(4px);
   flex-shrink: 0;
+  -webkit-appearance: none;
+  appearance: none;
 }
 
-.slider-pause:hover,
-.slider-pause:focus-visible {
-  background: rgba(0,0,0,0.65);
-  outline: 2px solid white;
-  outline-offset: 2px;
+.slider-arrow:hover { background: rgba(0,0,0,0.65); }
+.slider-arrow:focus { outline: none; box-shadow: none; }
+.slider-arrow:focus-visible { outline: none; box-shadow: none; }
+
+.slider-arrow--prev { left: 1.25rem; }
+.slider-arrow--next { right: 1.25rem; }
+
+.slider-arrow svg {
+  width: 1.25rem;
+  height: 1.25rem;
+  display: block;
+  flex-shrink: 0;
+}
+
+/* Footer: dots */
+.slider-footer {
+  position: absolute;
+  bottom: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  z-index: 3;
 }
 
 .slider-dots {

@@ -12,6 +12,7 @@ import {
 } from 'firebase/firestore'
 import { ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage'
 import { db, storage } from '../config/firebase'
+import type { EventCategory } from '../types/blog'
 
 export interface FirestoreEvent {
   id: string
@@ -21,12 +22,14 @@ export interface FirestoreEvent {
   slug: string
   date: string
   excerpt: string
+  category?: EventCategory
 }
 
 export interface EventFormData {
   title: string
   date: string
   excerpt: string
+  category: EventCategory
   imageFile?: File
   imageUrl?: string
 }
@@ -62,6 +65,7 @@ export async function createEvent(data: EventFormData): Promise<string> {
     slug: generateSlug(data.title),
     date: data.date,
     excerpt: data.excerpt,
+    category: data.category,
     imageUrl,
     imagePath,
     createdAt: serverTimestamp()
@@ -80,13 +84,13 @@ export async function getAllEvents(): Promise<FirestoreEvent[]> {
 }
 
 export async function updateEvent(id: string, data: EventFormData): Promise<void> {
-  let imageUrl = data.imageUrl ?? ''
   const updateData: Record<string, unknown> = {
     title: data.title,
     slug: generateSlug(data.title),
     date: data.date,
     excerpt: data.excerpt,
-    imageUrl,
+    category: data.category,
+    imageUrl: data.imageUrl ?? '',
     updatedAt: serverTimestamp()
   }
   if (data.imageFile) {
@@ -102,13 +106,28 @@ export async function deleteEvent(id: string): Promise<void> {
 }
 
 export function subscribeEvents(callback: (events: FirestoreEvent[]) => void): () => void {
-  return onSnapshot(
-    collection(db, 'events'),
-    snapshot => {
-      const list = snapshot.docs.map(d => ({ id: d.id, ...d.data() } as FirestoreEvent))
-      list.sort((a, b) => a.title.localeCompare(b.title))
-      callback(list)
-    },
-    () => { /* silently ignore errors */ }
-  )
+  let unsubscribe = () => {}
+
+  const trySubscribe = (withOrder: boolean) => {
+    const q = withOrder
+      ? query(collection(db, 'events'), orderBy('createdAt', 'desc'))
+      : collection(db, 'events')
+
+    unsubscribe = onSnapshot(
+      q,
+      snapshot => {
+        callback(snapshot.docs.map(d => ({ id: d.id, ...d.data() } as FirestoreEvent)))
+      },
+      error => {
+        if (withOrder && error?.code === 'failed-precondition') {
+          unsubscribe()
+          trySubscribe(false)
+          return
+        }
+      }
+    )
+  }
+
+  trySubscribe(true)
+  return () => unsubscribe()
 }

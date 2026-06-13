@@ -68,7 +68,7 @@
     </section>
 
     <!-- Sección Próximos Eventos -->
-    <section class="events-section section-anchor" id="eventos" data-section="eventos" v-if="blogStore.events.length > 0">
+    <section class="events-section section-anchor" id="eventos" data-section="eventos">
       <button
         class="back-to-top"
         :class="{ show: activeSection === 'eventos' }"
@@ -82,21 +82,52 @@
       <p class="section-subtitle">
         Mantente al día con festivales, ferias y actividades culturales que hacen vibrar cada provincia.
       </p>
-      <div class="events-grid">
-        <div
-          v-for="event in blogStore.events"
-          :key="event.id"
-          class="event-card"
-          :class="{ 'event-card-with-bg': isEventWithBackground(event) }"
-          :style="getEventBackground(event)"
+
+      <!-- Filtros de categoría -->
+      <div class="event-categories" role="group" aria-label="Filtrar eventos por categoría">
+        <button
+          v-for="cat in EVENT_CATEGORIES"
+          :key="cat.key"
+          class="event-cat-btn"
+          :class="{ active: selectedEventCategory === cat.key }"
+          :style="{ backgroundImage: `url(${cat.bg})` }"
+          @click="toggleEventCategory(cat.key)"
+          :aria-pressed="selectedEventCategory === cat.key"
         >
-          <div class="event-image" v-if="!isEventWithBackground(event)">
-            <img :src="event.imageUrl || ''" :alt="event.title" />
-          </div>
-          <div class="event-overlay" v-if="isEventWithBackground(event)"></div>
-          <h3 class="event-title">{{ event.title }}</h3>
-        </div>
+          <div class="event-cat-overlay"></div>
+          <span class="event-cat-label">{{ cat.label }}</span>
+          <span v-if="eventCountByCategory(cat.key) > 0" class="event-cat-count">
+            {{ eventCountByCategory(cat.key) }}
+          </span>
+        </button>
       </div>
+
+      <!-- Lista de eventos filtrados -->
+      <TransitionGroup
+        v-if="filteredEvents.length > 0"
+        name="ev-list"
+        tag="div"
+        class="events-list"
+      >
+        <div
+          v-for="event in filteredEvents"
+          :key="event.id"
+          class="event-list-card"
+        >
+          <div v-if="event.imageUrl" class="event-list-img">
+            <img :src="event.imageUrl" :alt="event.title" loading="lazy" />
+          </div>
+          <div class="event-list-body">
+            <h3 class="event-list-title">{{ event.title }}</h3>
+            <p v-if="event.excerpt" class="event-list-excerpt">{{ event.excerpt }}</p>
+            <span v-if="event.date" class="event-list-date">📅 {{ formatDate(event.date) }}</span>
+          </div>
+        </div>
+      </TransitionGroup>
+
+      <p v-else-if="selectedEventCategory" class="events-empty">
+        No hay eventos en esta categoría todavía.
+      </p>
     </section>
 
     <!-- Sección Provincias -->
@@ -245,6 +276,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
+import type { EventCategory } from '../types/blog'
 import { useRouter, RouterLink } from 'vue-router'
 import { useBlogStore } from '../stores/blog'
 import { subscribeAllArticles, type Article } from '../services/articleService'
@@ -413,75 +445,27 @@ const getProvinceBackground = (province: any) => {
   return {}
 }
 
-const isMusicaTradicional = (event: any) => {
-  const title = event.title?.toLowerCase() || ''
-  const slug = event.slug?.toLowerCase() || ''
-  return title.includes('música tradicional') || 
-         title.includes('musica tradicional') ||
-         slug.includes('musica-tradicional') ||
-         slug.includes('música-tradicional')
+// Categorías de eventos
+const EVENT_CATEGORIES = [
+  { key: 'musical' as EventCategory,     label: 'Musicales',     bg: festivalImage },
+  { key: 'artistico' as EventCategory,   label: 'Artísticos',    bg: arteImage },
+  { key: 'gastronomico' as EventCategory,label: 'Gastronómicos', bg: comidaGuineanaImage },
+  { key: 'deportivo' as EventCategory,   label: 'Deportivos',    bg: deporteImage },
+]
+
+const selectedEventCategory = ref<EventCategory | null>(null)
+
+const toggleEventCategory = (key: EventCategory) => {
+  selectedEventCategory.value = selectedEventCategory.value === key ? null : key
 }
 
-const isArte = (event: any) => {
-  const title = event.title?.toLowerCase() || ''
-  const slug = event.slug?.toLowerCase() || ''
-  return title.includes('arte') || 
-         slug.includes('arte')
-}
+const filteredEvents = computed(() => {
+  if (!selectedEventCategory.value) return []
+  return blogStore.events.filter(e => e.category === selectedEventCategory.value)
+})
 
-const isGastronomica = (event: any) => {
-  const title = event.title?.toLowerCase() || ''
-  const slug = event.slug?.toLowerCase() || ''
-  return title.includes('gastronómica') || 
-         title.includes('gastronomica') ||
-         slug.includes('gastronomica') ||
-         slug.includes('gastronómica')
-}
-
-const isDeportivo = (event: any) => {
-  const title = event.title?.toLowerCase() || ''
-  const slug = event.slug?.toLowerCase() || ''
-  return title.includes('deportivo') || 
-         title.includes('torneo') ||
-         slug.includes('deportivo') ||
-         slug.includes('torneo')
-}
-
-const isEventWithBackground = (event: any) => {
-  return isMusicaTradicional(event) || isArte(event) || isGastronomica(event) || isDeportivo(event)
-}
-
-const getEventBackground = (event: any) => {
-  if (isMusicaTradicional(event)) {
-    return {
-      backgroundImage: `url(${festivalImage})`,
-      backgroundSize: 'cover',
-      backgroundPosition: 'center'
-    }
-  }
-  if (isArte(event)) {
-    return {
-      backgroundImage: `url(${arteImage})`,
-      backgroundSize: 'cover',
-      backgroundPosition: 'center'
-    }
-  }
-  if (isGastronomica(event)) {
-    return {
-      backgroundImage: `url(${comidaGuineanaImage})`,
-      backgroundSize: 'cover',
-      backgroundPosition: 'center'
-    }
-  }
-  if (isDeportivo(event)) {
-    return {
-      backgroundImage: `url(${deporteImage})`,
-      backgroundSize: 'cover',
-      backgroundPosition: 'center'
-    }
-  }
-  return {}
-}
+const eventCountByCategory = (key: EventCategory) =>
+  blogStore.events.filter(e => e.category === key).length
 
 onMounted(() => {
   unsubscribeArticles = subscribeAllArticles((articles) => {
@@ -710,6 +694,158 @@ onUnmounted(() => {
   margin: 0 auto;
 }
 
+/* Filtros de categoría */
+.event-categories {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.25rem;
+  margin-bottom: 2rem;
+}
+
+.event-cat-btn {
+  position: relative;
+  height: 160px;
+  border-radius: 16px;
+  border: 3px solid transparent;
+  overflow: hidden;
+  cursor: pointer;
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: flex-end;
+  padding: 0;
+  transition: transform 0.25s, border-color 0.2s, box-shadow 0.25s;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.18);
+}
+
+.event-cat-btn:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 28px rgba(0,0,0,0.25);
+}
+
+.event-cat-btn.active {
+  border-color: #fff;
+  box-shadow: 0 0 0 3px rgba(102,126,234,0.6), 0 10px 28px rgba(0,0,0,0.25);
+  transform: translateY(-4px);
+}
+
+.event-cat-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.15) 60%);
+  transition: background 0.25s;
+}
+
+.event-cat-btn.active .event-cat-overlay,
+.event-cat-btn:hover .event-cat-overlay {
+  background: linear-gradient(to top, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.25) 60%);
+}
+
+.event-cat-label {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  padding: 0.85rem 1rem 0.75rem;
+  color: #fff;
+  font-weight: 700;
+  font-size: 1rem;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.5);
+}
+
+.event-cat-count {
+  position: absolute;
+  top: 0.6rem;
+  right: 0.7rem;
+  z-index: 1;
+  background: rgba(255,255,255,0.2);
+  backdrop-filter: blur(4px);
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.35);
+}
+
+/* Lista de eventos filtrados */
+.events-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.event-list-card {
+  display: flex;
+  gap: 1.25rem;
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.event-list-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.13);
+}
+
+.event-list-img {
+  width: 160px;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.event-list-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s;
+}
+
+.event-list-card:hover .event-list-img img {
+  transform: scale(1.05);
+}
+
+.event-list-body {
+  padding: 1.1rem 1.1rem 1.1rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  justify-content: center;
+}
+
+.event-list-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #2c3e50;
+  margin: 0;
+}
+
+.event-list-excerpt {
+  font-size: 0.9rem;
+  color: #666;
+  line-height: 1.55;
+  margin: 0;
+}
+
+.event-list-date {
+  font-size: 0.8rem;
+  color: #999;
+}
+
+.events-empty {
+  text-align: center;
+  color: #888;
+  padding: 2rem 0;
+  font-size: 0.95rem;
+}
+
+/* Animación lista de eventos */
+.ev-list-enter-active { transition: opacity 0.3s ease, transform 0.3s ease; }
+.ev-list-leave-active { transition: opacity 0.2s ease; }
+.ev-list-enter-from   { opacity: 0; transform: translateY(12px); }
+.ev-list-leave-to     { opacity: 0; }
+
 .section-title {
   font-size: 2.5rem;
   color: #2c3e50;
@@ -726,79 +862,6 @@ onUnmounted(() => {
   line-height: 1.6;
 }
 
-.events-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 2rem;
-}
-
-.event-card {
-  text-decoration: none;
-  color: inherit;
-  transition: transform 0.3s;
-}
-
-.event-card:hover,
-.event-card:active {
-  transform: translateY(-5px);
-}
-
-.event-card-with-bg {
-  position: relative;
-  height: 300px;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.event-image {
-  width: 100%;
-  height: 300px;
-  overflow: hidden;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-  margin-bottom: 1rem;
-}
-
-.event-image img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.3s;
-}
-
-.event-card:hover .event-image img,
-.event-card:active .event-image img {
-  transform: scale(1.1);
-}
-
-.event-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0,0,0,0.4);
-  z-index: 1;
-}
-
-.event-title {
-  font-size: 1.2rem;
-  color: #2c3e50;
-  text-align: center;
-  margin: 0;
-}
-
-.event-card-with-bg .event-title {
-  position: relative;
-  z-index: 2;
-  color: white;
-  text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-  padding: 1rem;
-}
 
 /* Sección Provincias */
 .provinces-section {
@@ -1065,7 +1128,10 @@ onUnmounted(() => {
 
 /* Responsive */
 @media (max-width: 1200px) {
-  .events-grid,
+  .event-categories {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
   .articles-grid {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -1098,7 +1164,19 @@ onUnmounted(() => {
     font-size: 0.9rem;
   }
 
-  .events-grid,
+  .event-categories {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+
+  .event-cat-btn {
+    height: 120px;
+  }
+
+  .event-list-img {
+    width: 110px;
+  }
+
   .articles-grid {
     grid-template-columns: 1fr;
   }

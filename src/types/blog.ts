@@ -25,13 +25,16 @@ export interface Sponsor {
   website: string
 }
 
+export type EventCategory = 'musical' | 'artistico' | 'gastronomico' | 'deportivo'
+
 export interface Event {
-  id: number
+  id: number | string
   title: string
   imageUrl: string
   slug: string
   date: string
   excerpt: string
+  category?: EventCategory
 }
 
 export interface Province {

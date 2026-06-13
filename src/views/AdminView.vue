@@ -262,6 +262,16 @@
               <input v-model="eventForm.title" type="text" class="form-input" placeholder="Título del evento" required />
             </div>
             <div class="form-group">
+              <label>Categoría *</label>
+              <select v-model="eventForm.category" class="form-select" required>
+                <option value="">Selecciona una categoría</option>
+                <option value="musical">🎵 Musicales</option>
+                <option value="artistico">🎨 Artísticos</option>
+                <option value="gastronomico">🍽️ Gastronómicos</option>
+                <option value="deportivo">⚽ Deportivos</option>
+              </select>
+            </div>
+            <div class="form-group">
               <label>Fecha</label>
               <input v-model="eventForm.date" type="date" class="form-input" />
             </div>
@@ -298,7 +308,9 @@
             <div v-if="loadingEvents" class="loading">Cargando...</div>
             <div v-else-if="adminEvents.length === 0" class="no-articles">
               No hay eventos aún.<br/>
-              <button class="btn-secondary" style="margin-top:1rem" @click="seedEvents">Importar eventos por defecto</button>
+              <button class="btn-secondary" style="margin-top:1rem" :disabled="seedingEvents" @click="seedEvents">
+                {{ seedingEvents ? 'Creando eventos...' : 'Crear eventos de prueba' }}
+              </button>
             </div>
             <div
               v-else
@@ -309,7 +321,10 @@
             >
               <div class="article-item-content">
                 <h3>{{ ev.title }}</h3>
-                <p class="article-meta"><span class="date">{{ ev.date }}</span></p>
+                <p class="article-meta">
+                  <span v-if="ev.category" class="category-badge" :class="ev.category">{{ ev.category }}</span>
+                  <span class="date">{{ ev.date }}</span>
+                </p>
                 <div v-if="ev.imageUrl" class="article-thumbnail">
                   <img :src="ev.imageUrl" :alt="ev.title" />
                 </div>
@@ -740,6 +755,7 @@ const eventForm = reactive<EventFormData>({
   title: '',
   date: new Date().toISOString().split('T')[0],
   excerpt: '',
+  category: 'musical',
   imageFile: undefined,
   imageUrl: ''
 })
@@ -771,6 +787,7 @@ const startEventEdit = (ev: FirestoreEvent) => {
   eventForm.title = ev.title
   eventForm.date = ev.date
   eventForm.excerpt = ev.excerpt
+  eventForm.category = ev.category ?? 'musical'
   eventForm.imageUrl = ev.imageUrl
   eventForm.imageFile = undefined
   eventImageFile.value = undefined
@@ -783,6 +800,7 @@ const cancelEventEdit = () => {
   eventForm.title = ''
   eventForm.date = new Date().toISOString().split('T')[0]
   eventForm.excerpt = ''
+  eventForm.category = 'musical'
   eventForm.imageUrl = ''
   eventForm.imageFile = undefined
   eventImageFile.value = undefined
@@ -821,6 +839,55 @@ const handleEventDelete = async () => {
     eventToDelete.value = null
     await loadEvents()
   } catch (e) { console.error(e) }
+}
+
+const seedingEvents = ref(false)
+
+const SEED_EVENTS: EventFormData[] = [
+  {
+    title: 'Festival de Música Tradicional de Malabo',
+    category: 'musical',
+    date: '2026-08-15',
+    excerpt: 'Gran festival de música y danza tradicional bubi y fang en el centro de Malabo. Artistas de todas las provincias.',
+    imageUrl: 'https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=800&auto=format&fit=crop&q=80'
+  },
+  {
+    title: 'Exposición de Arte Contemporáneo Ecuatoguineano',
+    category: 'artistico',
+    date: '2026-09-05',
+    excerpt: 'Pintores y escultores locales presentan sus obras en el Centro Cultural Hispano-Guineano de Bata.',
+    imageUrl: 'https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?w=800&auto=format&fit=crop&q=80'
+  },
+  {
+    title: 'Feria Gastronómica Nacional',
+    category: 'gastronomico',
+    date: '2026-10-01',
+    excerpt: 'Degustación de platos típicos de todas las regiones del país. Sopa de pescado, malanga, puerco con arroz y mucho más.',
+    imageUrl: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=800&auto=format&fit=crop&q=80'
+  },
+  {
+    title: 'Torneo Nacional de Fútbol Sub-21',
+    category: 'deportivo',
+    date: '2026-11-10',
+    excerpt: 'Equipos juveniles de las 8 provincias se enfrentan en el Estadio de Malabo por el título nacional.',
+    imageUrl: 'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=800&auto=format&fit=crop&q=80'
+  }
+]
+
+const seedEvents = async () => {
+  seedingEvents.value = true
+  try {
+    for (const ev of SEED_EVENTS) {
+      await createEvent(ev)
+    }
+    await loadEvents()
+    eventSuccess.value = 'Eventos de prueba creados correctamente'
+    setTimeout(() => { eventSuccess.value = '' }, 3000)
+  } catch (e: any) {
+    eventError.value = `Error al crear eventos: ${e.message ?? 'desconocido'}`
+  } finally {
+    seedingEvents.value = false
+  }
 }
 
 const DEFAULT_EVENTS = [

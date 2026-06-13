@@ -993,12 +993,13 @@ export const useBlogStore = defineStore('blog', () => {
   subscribeEvents(firestoreEvents => {
     if (firestoreEvents.length > 0) {
       events.value = firestoreEvents.map(e => ({
-        id: e.id as unknown as number,
+        id: e.id,
         title: e.title,
         imageUrl: e.imageUrl,
         slug: e.slug,
         date: e.date,
-        excerpt: e.excerpt
+        excerpt: e.excerpt,
+        category: e.category
       }))
     }
   })
