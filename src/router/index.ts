@@ -9,6 +9,7 @@ import NaturalezaView from '../views/NaturalezaView.vue'
 import OcioView from '../views/OcioView.vue'
 import ProvinceView from '../views/ProvinceView.vue'
 import AdminView from '../views/AdminView.vue'
+import EventCategoryView from '../views/EventCategoryView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -86,6 +87,11 @@ const router = createRouter({
       path: '/admin',
       name: 'admin',
       component: AdminView
+    },
+    {
+      path: '/eventos/:category',
+      name: 'event-category',
+      component: EventCategoryView
     }
   ]
 })

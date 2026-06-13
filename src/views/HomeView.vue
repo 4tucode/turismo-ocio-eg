@@ -83,51 +83,22 @@
         Mantente al día con festivales, ferias y actividades culturales que hacen vibrar cada provincia.
       </p>
 
-      <!-- Filtros de categoría -->
-      <div class="event-categories" role="group" aria-label="Filtrar eventos por categoría">
-        <button
+      <!-- Categorías de eventos — navegan a su página dedicada -->
+      <nav class="event-categories" aria-label="Categorías de eventos">
+        <RouterLink
           v-for="cat in EVENT_CATEGORIES"
           :key="cat.key"
+          :to="`/eventos/${cat.key}`"
           class="event-cat-btn"
-          :class="{ active: selectedEventCategory === cat.key }"
           :style="{ backgroundImage: `url(${cat.bg})` }"
-          @click="toggleEventCategory(cat.key)"
-          :aria-pressed="selectedEventCategory === cat.key"
         >
           <div class="event-cat-overlay"></div>
           <span class="event-cat-label">{{ cat.label }}</span>
           <span v-if="eventCountByCategory(cat.key) > 0" class="event-cat-count">
             {{ eventCountByCategory(cat.key) }}
           </span>
-        </button>
-      </div>
-
-      <!-- Lista de eventos filtrados -->
-      <TransitionGroup
-        v-if="filteredEvents.length > 0"
-        name="ev-list"
-        tag="div"
-        class="events-list"
-      >
-        <div
-          v-for="event in filteredEvents"
-          :key="event.id"
-          class="event-list-card"
-        >
-          <div v-if="event.imageUrl" class="event-list-img">
-            <img :src="event.imageUrl" :alt="event.title" loading="lazy" />
-          </div>
-          <div class="event-list-body">
-            <h3 class="event-list-title">{{ event.title }}</h3>
-            <p v-if="event.excerpt" class="event-list-excerpt">{{ event.excerpt }}</p>
-            <span v-if="event.date" class="event-list-date">📅 {{ formatDate(event.date) }}</span>
-          </div>
-        </div>
-      </TransitionGroup>
-
-      <p v-else-if="selectedEventCategory" class="events-empty">
-        No hay eventos en esta categoría todavía.
-      </p>
+        </RouterLink>
+      </nav>
     </section>
 
     <!-- Sección Provincias -->
@@ -453,17 +424,6 @@ const EVENT_CATEGORIES = [
   { key: 'deportivo' as EventCategory,   label: 'Deportivos',    bg: deporteImage },
 ]
 
-const selectedEventCategory = ref<EventCategory | null>(null)
-
-const toggleEventCategory = (key: EventCategory) => {
-  selectedEventCategory.value = selectedEventCategory.value === key ? null : key
-}
-
-const filteredEvents = computed(() => {
-  if (!selectedEventCategory.value) return []
-  return blogStore.events.filter(e => e.category === selectedEventCategory.value)
-})
-
 const eventCountByCategory = (key: EventCategory) =>
   blogStore.events.filter(e => e.category === key).length
 
@@ -723,11 +683,6 @@ onUnmounted(() => {
   box-shadow: 0 10px 28px rgba(0,0,0,0.25);
 }
 
-.event-cat-btn.active {
-  border-color: #fff;
-  box-shadow: 0 0 0 3px rgba(102,126,234,0.6), 0 10px 28px rgba(0,0,0,0.25);
-  transform: translateY(-4px);
-}
 
 .event-cat-overlay {
   position: absolute;
@@ -736,7 +691,6 @@ onUnmounted(() => {
   transition: background 0.25s;
 }
 
-.event-cat-btn.active .event-cat-overlay,
 .event-cat-btn:hover .event-cat-overlay {
   background: linear-gradient(to top, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.25) 60%);
 }
@@ -767,84 +721,6 @@ onUnmounted(() => {
   border: 1px solid rgba(255,255,255,0.35);
 }
 
-/* Lista de eventos filtrados */
-.events-list {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.event-list-card {
-  display: flex;
-  gap: 1.25rem;
-  background: white;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-
-.event-list-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 18px rgba(0,0,0,0.13);
-}
-
-.event-list-img {
-  width: 160px;
-  flex-shrink: 0;
-  overflow: hidden;
-}
-
-.event-list-img img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.3s;
-}
-
-.event-list-card:hover .event-list-img img {
-  transform: scale(1.05);
-}
-
-.event-list-body {
-  padding: 1.1rem 1.1rem 1.1rem 0;
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-  justify-content: center;
-}
-
-.event-list-title {
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: #2c3e50;
-  margin: 0;
-}
-
-.event-list-excerpt {
-  font-size: 0.9rem;
-  color: #666;
-  line-height: 1.55;
-  margin: 0;
-}
-
-.event-list-date {
-  font-size: 0.8rem;
-  color: #999;
-}
-
-.events-empty {
-  text-align: center;
-  color: #888;
-  padding: 2rem 0;
-  font-size: 0.95rem;
-}
-
-/* Animación lista de eventos */
-.ev-list-enter-active { transition: opacity 0.3s ease, transform 0.3s ease; }
-.ev-list-leave-active { transition: opacity 0.2s ease; }
-.ev-list-enter-from   { opacity: 0; transform: translateY(12px); }
-.ev-list-leave-to     { opacity: 0; }
 
 .section-title {
   font-size: 2.5rem;
@@ -1171,10 +1047,6 @@ onUnmounted(() => {
 
   .event-cat-btn {
     height: 120px;
-  }
-
-  .event-list-img {
-    width: 110px;
   }
 
   .articles-grid {
