@@ -19,7 +19,7 @@
 
     <!-- Artículo cargado -->
     <div v-else-if="post" class="post">
-      <RouterLink to="/" class="back-link">← Volver al inicio</RouterLink>
+      <button class="back-link" @click="goBack">← Volver</button>
 
       <article class="post-article">
         <div v-if="post.imageUrl" class="post-hero-image">
@@ -51,10 +51,19 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { useRoute, RouterLink } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { subscribeArticleBySlug, type Article } from '../services/articleService'
 
 const route = useRoute()
+const router = useRouter()
+
+const goBack = () => {
+  if (window.history.length > 1) {
+    router.back()
+  } else {
+    router.push('/')
+  }
+}
 
 const post = ref<Article | null>(null)
 const loading = ref(true)
@@ -116,10 +125,15 @@ const formatCategory = (category?: string) => {
 
 .back-link {
   display: inline-block;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
   color: #42b983;
   text-decoration: none;
   margin-bottom: 2rem;
   font-weight: 500;
+  font-size: 1rem;
   transition: color 0.2s;
 }
 
@@ -138,14 +152,12 @@ const formatCategory = (category?: string) => {
 
 .post-hero-image {
   width: 100%;
-  height: 420px;
-  overflow: hidden;
 }
 
 .post-hero-image img {
   width: 100%;
-  height: 100%;
-  object-fit: cover;
+  height: auto;
+  display: block;
 }
 
 .post-article h1 {
@@ -227,7 +239,7 @@ const formatCategory = (category?: string) => {
 
 .skeleton-hero {
   width: 100%;
-  height: 420px;
+  height: 340px;
   background: linear-gradient(90deg, #e8e8e8 25%, #f5f5f5 50%, #e8e8e8 75%);
   background-size: 200% 100%;
   animation: shimmer 1.4s infinite;
@@ -299,9 +311,8 @@ const formatCategory = (category?: string) => {
 
   .post-content { padding-bottom: 2rem; }
 
-  .post-hero-image,
   .skeleton-hero {
-    height: 260px;
+    height: 220px;
   }
 }
 </style>
