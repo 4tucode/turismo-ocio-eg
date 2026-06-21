@@ -160,7 +160,8 @@
                 class="form-input"
               />
               <small class="form-help">Solo archivos .jpg, .jpeg, .png</small>
-              <div v-if="formData.imageFile" class="image-preview">
+              <small v-if="isCompressing" class="form-help" style="color:#4f46e5">Comprimiendo imagen...</small>
+              <div v-if="formData.imageFile && !isCompressing" class="image-preview">
                 <img :src="imagePreview" alt="Preview" />
                 <span>{{ formData.imageFile.name }}</span>
               </div>
@@ -171,8 +172,9 @@
             </div>
 
             <div class="form-actions">
-              <button type="submit" class="btn-primary" :disabled="isSubmitting || isUploading">
-                <span v-if="isUploading">Subiendo imagen... {{ uploadProgress }}%</span>
+              <button type="submit" class="btn-primary" :disabled="isSubmitting || isUploading || isCompressing">
+                <span v-if="isCompressing">Comprimiendo imagen...</span>
+                <span v-else-if="isUploading">Subiendo imagen... {{ uploadProgress }}%</span>
                 <span v-else-if="isSubmitting">Guardando...</span>
                 <span v-else>{{ editingArticle ? 'Actualizar' : 'Publicar' }}</span>
               </button>
@@ -426,6 +428,7 @@ import { ref, reactive, onMounted, onUnmounted, watch } from 'vue'
 import { useEditor, EditorContent } from '@tiptap/vue-3'
 import StarterKit from '@tiptap/starter-kit'
 import Placeholder from '@tiptap/extension-placeholder'
+import imageCompression from 'browser-image-compression'
 import {
   createArticle,
   getAllArticles,
@@ -490,6 +493,7 @@ const submitSuccess = ref('')
 const articleToDelete = ref<Article | null>(null)
 
 const imagePreview = ref('')
+const isCompressing = ref(false)
 
 watch(
   () => formData.imageFile,
@@ -524,17 +528,30 @@ const logout = () => {
   resetForm()
 }
 
-const handleImageChange = (event: Event) => {
+const handleImageChange = async (event: Event) => {
   const target = event.target as HTMLInputElement
-  if (target.files && target.files[0]) {
-    const file = target.files[0]
-    const validTypes = ['image/jpeg', 'image/jpg', 'image/png']
-    if (validTypes.includes(file.type)) {
-      formData.imageFile = file
-    } else {
-      alert('Solo se permiten archivos .jpg, .jpeg o .png')
-      target.value = ''
-    }
+  if (!target.files || !target.files[0]) return
+
+  const file = target.files[0]
+  const validTypes = ['image/jpeg', 'image/jpg', 'image/png']
+  if (!validTypes.includes(file.type)) {
+    alert('Solo se permiten archivos .jpg, .jpeg o .png')
+    target.value = ''
+    return
+  }
+
+  isCompressing.value = true
+  try {
+    const compressed = await imageCompression(file, {
+      maxSizeMB: 0.25,
+      maxWidthOrHeight: 1200,
+      useWebWorker: true
+    })
+    formData.imageFile = new File([compressed], file.name, { type: file.type })
+  } catch {
+    formData.imageFile = file
+  } finally {
+    isCompressing.value = false
   }
 }
 
