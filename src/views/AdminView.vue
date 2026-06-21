@@ -144,6 +144,24 @@
                     @click="editor?.chain().focus().redo().run()" title="Rehacer">
                     ↪
                   </button>
+                  <span class="tool-sep"></span>
+                  <button
+                    type="button"
+                    class="tool-btn tool-btn--image"
+                    :disabled="isUploadingInlineImage"
+                    @click="inlineImageInput?.click()"
+                    title="Insertar imagen"
+                  >
+                    <span v-if="isUploadingInlineImage">...</span>
+                    <span v-else>🖼</span>
+                  </button>
+                  <input
+                    ref="inlineImageInput"
+                    type="file"
+                    accept=".jpg,.jpeg,.png"
+                    style="display:none"
+                    @change="handleInlineImageChange"
+                  />
                 </div>
                 <!-- Área de edición -->
                 <EditorContent :editor="editor" class="editor-content" />
@@ -428,7 +446,9 @@ import { ref, reactive, onMounted, onUnmounted, watch } from 'vue'
 import { useEditor, EditorContent } from '@tiptap/vue-3'
 import StarterKit from '@tiptap/starter-kit'
 import Placeholder from '@tiptap/extension-placeholder'
+import Image from '@tiptap/extension-image'
 import imageCompression from 'browser-image-compression'
+import { uploadImage } from '../services/articleService'
 import {
   createArticle,
   getAllArticles,
@@ -474,7 +494,8 @@ const formData = reactive<ArticleFormData>({
 const editor = useEditor({
   extensions: [
     StarterKit,
-    Placeholder.configure({ placeholder: 'Escribe el contenido del artículo aquí...' })
+    Placeholder.configure({ placeholder: 'Escribe el contenido del artículo aquí...' }),
+    Image.configure({ inline: false, allowBase64: false })
   ],
   content: '',
   onUpdate({ editor: e }) {
@@ -494,6 +515,8 @@ const articleToDelete = ref<Article | null>(null)
 
 const imagePreview = ref('')
 const isCompressing = ref(false)
+const isUploadingInlineImage = ref(false)
+const inlineImageInput = ref<HTMLInputElement | null>(null)
 
 watch(
   () => formData.imageFile,
@@ -552,6 +575,36 @@ const handleImageChange = async (event: Event) => {
     formData.imageFile = file
   } finally {
     isCompressing.value = false
+  }
+}
+
+const handleInlineImageChange = async (event: Event) => {
+  const target = event.target as HTMLInputElement
+  if (!target.files || !target.files[0]) return
+
+  const file = target.files[0]
+  const validTypes = ['image/jpeg', 'image/jpg', 'image/png']
+  if (!validTypes.includes(file.type)) {
+    alert('Solo se permiten archivos .jpg, .jpeg o .png')
+    target.value = ''
+    return
+  }
+
+  isUploadingInlineImage.value = true
+  try {
+    const compressed = await imageCompression(file, {
+      maxSizeMB: 0.25,
+      maxWidthOrHeight: 1200,
+      useWebWorker: true
+    })
+    const compressedFile = new File([compressed], file.name, { type: file.type })
+    const { url } = await uploadImage(compressedFile)
+    editor.value?.chain().focus().setImage({ src: url }).run()
+  } catch (e: any) {
+    alert(`Error al subir la imagen: ${e.message ?? 'desconocido'}`)
+  } finally {
+    isUploadingInlineImage.value = false
+    target.value = ''
   }
 }
 
@@ -1251,6 +1304,20 @@ onMounted(() => {
   border-radius: 4px;
   font-size: 0.875em;
   font-family: monospace;
+}
+.editor-content :deep(img) {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  margin: 1rem 0;
+  display: block;
+}
+.tool-btn--image {
+  font-size: 1rem;
+}
+.tool-btn--image:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .form-help {
