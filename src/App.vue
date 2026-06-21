@@ -94,7 +94,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
 import { RouterLink, RouterView } from 'vue-router'
-import logoImage from './assets/logo-sin-fondo.png'
+import logoImage from './assets/logo-nuevo.png'
 import bgFooterImage from './assets/bg-footer.png'
 import logo4tucode from './assets/4tucode.png'
 
