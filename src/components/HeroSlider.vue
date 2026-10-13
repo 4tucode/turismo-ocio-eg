@@ -10,32 +10,21 @@
     @keydown="handleKeydown"
   >
     <div class="slider-container" aria-live="polite" aria-atomic="true">
-      <transition-group name="slide" tag="div" class="slides">
+      <Transition name="fade" mode="out-in">
         <div
-          v-for="(slide, index) in slides"
-          :key="slide.id"
-          v-show="index === currentSlide"
+          :key="currentSlideData.id"
           class="slide"
-          :style="slide.videoUrl ? {} : { backgroundImage: `url(${slide.imageUrl})` }"
-          :aria-hidden="index !== currentSlide"
+          :style="{ backgroundImage: `url(${currentSlideData.imageUrl})` }"
         >
-          <video
-            v-if="slide.videoUrl"
-            :ref="(el) => setVideoRef(el, index)"
-            :src="slide.videoUrl"
-            class="slide-video"
-            muted
-            loop
-            playsinline
-            autoplay
-            aria-hidden="true"
-          />
           <div class="slide-content">
-            <h1>{{ slide.title }}</h1>
-            <p>{{ slide.subtitle }}</p>
+            <h1>{{ currentSlideData.title }}</h1>
+            <p>{{ currentSlideData.subtitle }}</p>
+            <RouterLink :to="currentSlideData.link" class="slide-cta">
+              Explorar destinos
+            </RouterLink>
           </div>
         </div>
-      </transition-group>
+      </Transition>
     </div>
 
     <!-- Controles de navegación -->
@@ -65,7 +54,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { RouterLink } from 'vue-router'
 import type { Slide } from '../types/blog'
 
 const props = defineProps<{
@@ -73,40 +63,19 @@ const props = defineProps<{
 }>()
 
 const currentSlide = ref(0)
-const videoRefs = ref<(HTMLVideoElement | null)[]>([])
+const currentSlideData = computed(() => props.slides[currentSlide.value])
 let intervalId: number | null = null
-
-const setVideoRef = (el: unknown, index: number) => {
-  if (el instanceof HTMLVideoElement) {
-    videoRefs.value[index] = el
-  }
-}
-
-const playCurrentVideo = () => {
-  videoRefs.value.forEach((v: HTMLVideoElement | null, i: number) => {
-    if (v) {
-      if (i === currentSlide.value) {
-        v.play().catch(() => {})
-      } else {
-        v.pause()
-      }
-    }
-  })
-}
 
 const nextSlide = () => {
   currentSlide.value = (currentSlide.value + 1) % props.slides.length
-  playCurrentVideo()
 }
 
 const prevSlide = () => {
   currentSlide.value = currentSlide.value === 0 ? props.slides.length - 1 : currentSlide.value - 1
-  playCurrentVideo()
 }
 
 const goToSlide = (index: number) => {
   currentSlide.value = index
-  playCurrentVideo()
 }
 
 const startAutoplay = () => {
@@ -128,7 +97,6 @@ const handleKeydown = (e: KeyboardEvent) => {
 
 onMounted(() => {
   startAutoplay()
-  playCurrentVideo()
 })
 
 onUnmounted(() => {
@@ -152,12 +120,6 @@ onUnmounted(() => {
   position: relative;
 }
 
-.slides {
-  width: 100%;
-  height: 100%;
-  position: relative;
-}
-
 .slide {
   position: absolute;
   width: 100%;
@@ -170,17 +132,6 @@ onUnmounted(() => {
   filter: sepia(20%) brightness(1.05) saturate(1.15);
 }
 
-.slide-video {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  z-index: 0;
-  opacity: 0.6;
-}
-
 .slide::before {
   content: '';
   position: absolute;
@@ -188,11 +139,6 @@ onUnmounted(() => {
   background: linear-gradient(to bottom, rgba(255, 200, 150, 0.25), rgba(200, 150, 100, 0.35));
   mix-blend-mode: overlay;
   z-index: 1;
-}
-
-.slide:has(.slide-video)::before {
-  background: rgba(0, 0, 0, 0.5);
-  mix-blend-mode: normal;
 }
 
 .slide-content {
@@ -213,6 +159,26 @@ onUnmounted(() => {
 .slide-content p {
   font-size: 1.5rem;
   text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+}
+
+.slide-cta {
+  display: inline-block;
+  margin-top: 1.75rem;
+  padding: 0.85rem 2rem;
+  background: #f5a623;
+  color: #1a1a1a;
+  font-weight: 700;
+  font-size: 1.05rem;
+  text-decoration: none;
+  border-radius: 999px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
+  transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+}
+
+.slide-cta:hover {
+  background: #ffb949;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
 }
 
 /* Flechas de navegación */
@@ -298,19 +264,19 @@ onUnmounted(() => {
 }
 
 /* Transiciones */
-.slide-enter-active,
-.slide-leave-active {
+.fade-enter-active,
+.fade-leave-active {
   transition: opacity 0.5s;
 }
 
-.slide-enter-from,
-.slide-leave-to {
+.fade-enter-from,
+.fade-leave-to {
   opacity: 0;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .slide-enter-active,
-  .slide-leave-active {
+  .fade-enter-active,
+  .fade-leave-active {
     transition: none;
   }
   .slider-arrow,
@@ -330,6 +296,12 @@ onUnmounted(() => {
 
   .slide-content p {
     font-size: 1.125rem;
+  }
+
+  .slide-cta {
+    margin-top: 1.25rem;
+    padding: 0.7rem 1.5rem;
+    font-size: 0.95rem;
   }
 
   .slider-arrow {

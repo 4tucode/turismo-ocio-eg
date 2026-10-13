@@ -2,10 +2,11 @@
 <template>
   <div id="app">
     <a href="#main-content" class="skip-link">Saltar al contenido principal</a>
-    <header class="header">
+    <header class="header" :class="{ 'header--scrolled': isScrolled }">
       <nav class="nav" aria-label="Navegación principal">
         <RouterLink to="/" class="logo" @click="closeMenu">
           <img :src="logoImage" alt="Turismo y ocio EG - Inicio" class="logo-img" />
+          <span class="logo-subtitle">Guinea Ecuatorial</span>
         </RouterLink>
 
         <button
@@ -21,12 +22,12 @@
         </button>
 
         <div class="nav-links" :class="{ open: isMenuOpen }">
-          <RouterLink to="/" active-class="" exact-active-class="" @click="closeMenu">Inicio</RouterLink>
-          <RouterLink to="#categorias" active-class="" exact-active-class="" @click="closeMenu">Categorías</RouterLink>
-          <RouterLink to="#eventos" active-class="" exact-active-class="" @click="closeMenu">Eventos</RouterLink>
-          <RouterLink to="#provincias" active-class="" exact-active-class="" @click="closeMenu">Provincias</RouterLink>
-          <RouterLink to="#servicios" active-class="" exact-active-class="" @click="closeMenu">Servicios</RouterLink>
-          <RouterLink to="/about" active-class="" exact-active-class="" @click="closeMenu">Acerca de</RouterLink>
+          <RouterLink to="/" class="nav-link" :class="{ 'nav-link-active': isHomeActive }" @click="closeMenu">Inicio</RouterLink>
+          <RouterLink to="#categorias" class="nav-link" :class="{ 'nav-link-active': route.hash === '#categorias' }" @click="closeMenu">Categorías</RouterLink>
+          <RouterLink to="#eventos" class="nav-link" :class="{ 'nav-link-active': route.hash === '#eventos' }" @click="closeMenu">Eventos</RouterLink>
+          <RouterLink to="#provincias" class="nav-link" :class="{ 'nav-link-active': route.hash === '#provincias' }" @click="closeMenu">Provincias</RouterLink>
+          <RouterLink to="#servicios" class="nav-link" :class="{ 'nav-link-active': route.hash === '#servicios' }" @click="closeMenu">Servicios</RouterLink>
+          <RouterLink to="/about" class="nav-link" :class="{ 'nav-link-active': route.path === '/about' }" @click="closeMenu">Acerca de</RouterLink>
         </div>
       </nav>
       <div v-if="isMenuOpen" class="nav-backdrop" @click="closeMenu"></div>
@@ -92,13 +93,17 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
-import { RouterLink, RouterView } from 'vue-router'
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
+import { RouterLink, RouterView, useRoute } from 'vue-router'
 import logoImage from './assets/logo-nuevo.png'
 import bgFooterImage from './assets/bg-footer.png'
 import logo4tucode from './assets/4tucode.png'
 
+const route = useRoute()
 const isMenuOpen = ref(false)
+const isScrolled = ref(false)
+
+const isHomeActive = computed(() => route.path === '/' && !route.hash)
 
 const toggleMenu = () => {
   isMenuOpen.value = !isMenuOpen.value
@@ -112,8 +117,25 @@ const handleKeydown = (e: KeyboardEvent) => {
   if (e.key === 'Escape' && isMenuOpen.value) closeMenu()
 }
 
-onMounted(() => document.addEventListener('keydown', handleKeydown))
-onUnmounted(() => document.removeEventListener('keydown', handleKeydown))
+const handleScroll = () => {
+  isScrolled.value = window.scrollY > 40
+}
+
+watch(isMenuOpen, (open) => {
+  document.body.style.overflow = open ? 'hidden' : ''
+})
+
+onMounted(() => {
+  document.addEventListener('keydown', handleKeydown)
+  window.addEventListener('scroll', handleScroll, { passive: true })
+  handleScroll()
+})
+
+onUnmounted(() => {
+  document.removeEventListener('keydown', handleKeydown)
+  window.removeEventListener('scroll', handleScroll)
+  document.body.style.overflow = ''
+})
 </script>
 
 <style scoped>
@@ -150,12 +172,32 @@ onUnmounted(() => document.removeEventListener('keydown', handleKeydown))
   color: white;
   padding: 1rem 0;
   box-shadow: none;
-  position: absolute;
+  position: fixed;
   width: 100%;
   z-index: 10;
   top: 0;
   left: 0;
   pointer-events: none;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.header::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.45), transparent);
+  pointer-events: none;
+  z-index: 0;
+  transition: opacity 0.3s ease;
+}
+
+.header--scrolled {
+  background-color: rgba(20, 20, 20, 0.92);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.25);
+}
+
+.header--scrolled::before {
+  opacity: 0;
 }
 
 .nav {
@@ -169,20 +211,32 @@ onUnmounted(() => document.removeEventListener('keydown', handleKeydown))
   align-items: center;
   flex-wrap: wrap;
   position: relative;
+  z-index: 1;
 }
 
 .logo {
   display: flex;
   align-items: center;
+  gap: 0.65rem;
   text-decoration: none;
-  height: 130px;
-  filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.5));
+  height: 148px;
+  filter: drop-shadow(3px 3px 7px rgba(0,0,0,0.6));
 }
 
 .logo-img {
-  height: 130px;
+  height: 148px;
   width: auto;
   object-fit: contain;
+}
+
+.logo-subtitle {
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.7);
+  white-space: nowrap;
 }
 
 .nav-links {
@@ -233,14 +287,36 @@ onUnmounted(() => document.removeEventListener('keydown', handleKeydown))
 .nav-links a {
   color: white;
   text-decoration: none;
-  transition: color 0.3s;
   font-weight: 500;
   text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+  position: relative;
+  padding-bottom: 0.3rem;
+  transition: color 0.25s ease;
 }
 
-.nav-links a:hover,
-.nav-links a.router-link-active {
-  color: #fff;
+.nav-links a::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 100%;
+  bottom: 0;
+  height: 2px;
+  border-radius: 999px;
+  background: #f5a623;
+  transition: right 0.25s ease;
+}
+
+.nav-links a:hover {
+  color: #f5a623;
+}
+
+.nav-links a:hover::after,
+.nav-links a.nav-link-active::after {
+  right: 0;
+}
+
+.nav-links a.nav-link-active {
+  color: #f5a623;
   text-shadow: 2px 2px 6px rgba(0,0,0,0.7);
 }
 
@@ -369,38 +445,24 @@ onUnmounted(() => document.removeEventListener('keydown', handleKeydown))
 }
 
 @media (max-width: 1024px) {
-  .logo {
-    height: 110px;
-  }
-
-  .logo-img {
-    height: 110px;
-  }
-  
-  .nav-links {
-    gap: 1.5rem;
-  }
-}
-
-@media (max-width: 768px) {
   .header {
     padding: 0.5rem 0;
   }
-  
+
   .nav {
     flex-direction: row;
     gap: 1rem;
-    padding: 0 1rem;
+    padding: 0 1.5rem;
   }
-  
+
   .logo {
-    height: 85px;
+    height: 100px;
   }
 
   .logo-img {
-    height: 85px;
+    height: 100px;
   }
-  
+
   .nav-links {
     position: absolute;
     top: calc(100% + 0.5rem);
@@ -435,7 +497,7 @@ onUnmounted(() => document.removeEventListener('keydown', handleKeydown))
     background: rgba(255, 255, 255, 0.12);
   }
 
-  .nav-links a.router-link-active,
+  .nav-links a.nav-link-active,
   .nav-links a:active,
   .nav-links a:focus {
     background: transparent;
@@ -458,26 +520,22 @@ onUnmounted(() => document.removeEventListener('keydown', handleKeydown))
   .header {
     padding: 0.5rem 0;
   }
-  
+
   .nav {
     padding: 0 0.75rem;
   }
-  
+
   .logo {
     height: 70px;
+    gap: 0.4rem;
   }
 
   .logo-img {
     height: 70px;
   }
-  
-  .nav-links {
-    gap: 0.5rem;
-    font-size: 0.8rem;
-  }
-  
-  .nav-links a {
-    padding: 0.25rem 0.5rem;
+
+  .logo-subtitle {
+    display: none;
   }
 }
 </style>

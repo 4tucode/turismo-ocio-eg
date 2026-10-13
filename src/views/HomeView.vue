@@ -270,7 +270,6 @@ import portada2Image from '../assets/portada2.jpg'
 import portada3Image from '../assets/portad3.jpg'
 import bataImage from '../assets/Bata.jpg'
 import imagenFondoImage from '../assets/imagen-fondo.png'
-import v1Video from '../assets/v1.mp4'
 
 const router = useRouter()
 const blogStore = useBlogStore()
@@ -294,12 +293,11 @@ const goToPage = (page: number) => {
   currentPage.value = page
 }
 
-// Slides de portada con vídeos de fondo (v1, v2) y textos
+// Slides de portada con imágenes de fondo y textos
 const portadaSlides = computed<Slide[]>(() => [
   {
     id: 1,
     imageUrl: portada1Image,
-    videoUrl: v1Video,
     title: 'Descubre Guinea Ecuatorial',
     subtitle: 'El corazón de África Central',
     link: '/about'
@@ -314,7 +312,6 @@ const portadaSlides = computed<Slide[]>(() => [
   {
     id: 3,
     imageUrl: portada3Image,
-    videoUrl: v1Video,
     title: 'Naturaleza Exuberante',
     subtitle: 'Biodiversidad única en el mundo',
     link: '/post/naturaleza-guinea'

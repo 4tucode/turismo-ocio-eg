@@ -79,7 +79,6 @@ export interface Banner {
 export interface Slide {
   id: number
   imageUrl: string
-  videoUrl?: string
   title: string
   subtitle: string
   link: string
