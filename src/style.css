@@ -1,10 +1,9 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+/* Tailwind sin preflight: las vistas que aún no se han rediseñado conservan su CSS propio */
+@layer theme, base, components, utilities;
+@import 'tailwindcss/theme.css' layer(theme);
+@import 'tailwindcss/utilities.css' layer(utilities);
 
-:root {
+@theme {
   /* Color */
   --color-paper: #f7f5f0;
   --color-paper-alt: #efe9df;
@@ -12,7 +11,6 @@
   --color-ink-soft: #55534d;
   --color-ink-muted: #8a877f;
   --color-rule: #d9d4c9;
-  --color-rule-strong: #1a1a17;
   --color-accent: #c53030;
   --color-accent-hover: #a82828;
   --color-accent-soft: #e9a39c;
@@ -28,8 +26,6 @@
     'Helvetica Neue', sans-serif;
 
   --text-kicker: 0.6875rem;
-  --text-small: 0.8125rem;
-  --text-body: 1rem;
   --text-lead: 1.125rem;
   --text-h3: 1.625rem;
   --text-h2: clamp(2rem, 4vw, 3.25rem);
@@ -38,68 +34,73 @@
   --tracking-kicker: 0.18em;
   --tracking-display: -0.03em;
 
-  /* Espaciado y rejilla */
-  --container: 1256px;
-  --gutter: clamp(1rem, 4vw, 2rem);
-  --space-1: 0.5rem;
-  --space-2: 1rem;
-  --space-3: 1.5rem;
-  --space-4: 2.5rem;
-  --space-5: 4rem;
-  --space-6: 6rem;
-
-  font-family: var(--font-sans);
-  line-height: 1.5;
-  font-weight: 400;
-
-  color-scheme: light;
-  color: var(--color-ink);
-  background-color: var(--color-paper);
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  /* Rejilla */
+  --container-page: 1256px;
 }
 
-body {
-  margin: 0;
-  min-height: 100vh;
-}
+@layer base {
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
 
-h1,
-h2,
-h3,
-h4 {
-  font-family: var(--font-display);
-  font-weight: 400;
-  letter-spacing: var(--tracking-display);
-  color: var(--color-ink);
-}
+  :root {
+    --gutter: clamp(1rem, 4vw, 2rem);
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
-}
+    font-family: var(--font-sans);
+    line-height: 1.5;
+    font-weight: 400;
 
-button {
-  border-radius: 0;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: var(--color-paper);
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
+    color-scheme: light;
+    color: var(--color-ink);
+    background-color: var(--color-paper);
 
-button:hover {
-  border-color: var(--color-ink);
-}
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
 
-button:focus,
-button:focus-visible {
-  outline: 2px solid var(--color-accent);
-  outline-offset: 2px;
+  body {
+    margin: 0;
+    min-height: 100vh;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    font-weight: 400;
+    letter-spacing: var(--tracking-display);
+    color: var(--color-ink);
+  }
+
+  h1 {
+    font-size: 3.2em;
+    line-height: 1.1;
+  }
+
+  button {
+    border-radius: 0;
+    border: 1px solid transparent;
+    padding: 0.6em 1.2em;
+    font-size: 1em;
+    font-weight: 500;
+    font-family: inherit;
+    background-color: var(--color-paper);
+    cursor: pointer;
+    transition: border-color 0.25s;
+  }
+
+  button:hover {
+    border-color: var(--color-ink);
+  }
+
+  button:focus,
+  button:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
 }
