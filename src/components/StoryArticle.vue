@@ -83,6 +83,7 @@ import { RouterLink } from 'vue-router'
 import type { Article } from '../services/articleService'
 import { subscribeArticlesByCategory } from '../services/articleService'
 import { categoryLabel, categoryPath, formatLongDate, readingMinutes } from '../utils/editorial'
+import { applyArticleSeo, articlePath, resetSeo } from '../utils/seo'
 import StoryCard from './StoryCard.vue'
 
 const RELATED_COUNT = 3
@@ -93,7 +94,9 @@ const props = defineProps<{
 
 const sectionPath = computed(() => categoryPath(props.article.category))
 
-const linkTo = (item: Article) => (categoryPath(item.category) === '/' ? `/post/${item.slug}` : `/${item.category}/${item.slug}`)
+const linkTo = articlePath
+
+watch(() => props.article, applyArticleSeo, { immediate: true })
 
 const sameCategory = ref<Article[]>([])
 const related = computed(() => sameCategory.value.filter((item) => item.id !== props.article.id).slice(0, RELATED_COUNT))
@@ -113,6 +116,7 @@ watch(
 
 onUnmounted(() => {
   unsubscribe?.()
+  resetSeo()
 })
 </script>
 

@@ -25,11 +25,13 @@
 
 <script setup lang="ts">
 import { ref, watch, onUnmounted } from 'vue'
-import { useRoute, RouterLink } from 'vue-router'
+import { useRoute, useRouter, RouterLink } from 'vue-router'
 import { subscribeArticleBySlug, type Article } from '../services/articleService'
+import { articlePath } from '../utils/seo'
 import StoryArticle from '../components/StoryArticle.vue'
 
 const route = useRoute()
+const router = useRouter()
 const post = ref<Article | null>(null)
 const loading = ref(true)
 let unsubscribe: (() => void) | null = null
@@ -45,6 +47,10 @@ watch(
       (article) => {
         post.value = article
         loading.value = false
+        // Cada artículo responde en /post/:slug y en /:categoria/:slug; se deja una sola URL
+        if (article && route.path !== articlePath(article)) {
+          router.replace({ path: articlePath(article), hash: route.hash })
+        }
       },
       () => {
         loading.value = false

@@ -29,6 +29,11 @@ export interface Article {
   imageCredit?: string
   imageCreditUrl?: string
   location?: string
+  // SEO: título para el buscador (el visible sigue siendo `title`, del que sale el slug)
+  seoTitle?: string
+  metaDescription?: string
+  // Datos estructurados del artículo, como texto JSON-LD
+  jsonLd?: string
   createdAt?: any
   updatedAt?: any
 }
@@ -245,6 +250,9 @@ const mapArticle = (docSnap: any): Article => {
     imageCredit: data.imageCredit || '',
     imageCreditUrl: data.imageCreditUrl || '',
     location: data.location || '',
+    seoTitle: data.seoTitle || '',
+    metaDescription: data.metaDescription || '',
+    jsonLd: data.jsonLd || '',
     createdAt: data.createdAt,
     updatedAt: data.updatedAt
   }

@@ -35,12 +35,12 @@
 
     <template v-else>
       <div class="grid gap-x-8 gap-y-10 md:grid-cols-[4fr_3fr_3fr]">
-        <StoryCard v-for="article in featured" :key="article.id" :article="article" :to="`/post/${article.slug}`" />
+        <StoryCard v-for="article in featured" :key="article.id" :article="article" :to="articlePath(article)" />
       </div>
 
       <ul v-if="more.length > 0" class="mt-12 grid list-none gap-x-8 border-t border-ink sm:grid-cols-2 lg:grid-cols-4">
         <li v-for="article in more" :key="article.id" class="border-b border-rule py-5 lg:border-b-0">
-          <StoryCard :article="article" :to="`/post/${article.slug}`" variant="compact" />
+          <StoryCard :article="article" :to="articlePath(article)" variant="compact" />
         </li>
       </ul>
     </template>
@@ -50,6 +50,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import type { Article } from '../services/articleService'
+import { articlePath } from '../utils/seo'
 import StoryCard from './StoryCard.vue'
 
 const FEATURED_PER_PAGE = 3

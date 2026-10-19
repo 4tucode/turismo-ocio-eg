@@ -23,7 +23,9 @@ export const formatLongDate = (value?: string) => {
 }
 
 const toPlainText = (html: string) => {
-  const doc = new DOMParser().parseFromString(html, 'text/html')
+  // Espacio tras cada bloque para que no se peguen los párrafos al quitar las etiquetas
+  const spaced = html.replace(/<\/(p|h[1-6]|li|blockquote)>/g, '$& ')
+  const doc = new DOMParser().parseFromString(spaced, 'text/html')
   return (doc.body.textContent ?? '').replace(/\s+/g, ' ').trim()
 }
 
