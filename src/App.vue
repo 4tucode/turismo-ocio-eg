@@ -2,108 +2,164 @@
 <template>
   <div id="app">
     <a href="#main-content" class="skip-link">Saltar al contenido principal</a>
-    <header class="header" :class="{ 'header--scrolled': isScrolled }">
-      <nav class="nav" aria-label="Navegación principal">
-        <RouterLink to="/" class="logo" @click="closeMenu">
-          <img :src="logoImage" alt="Turismo y ocio EG - Inicio" class="logo-img" />
-          <span class="logo-subtitle">Guinea Ecuatorial</span>
+    <header class="relative z-20 bg-paper text-ink">
+      <div class="border-b border-rule bg-paper-alt">
+        <div class="mx-auto flex max-w-page items-center justify-between gap-4 px-(--gutter) py-2 text-kicker font-medium uppercase tracking-kicker">
+          <span>Malabo · {{ today }}</span>
+          <span class="hidden sm:inline">Guinea Ecuatorial</span>
+        </div>
+      </div>
+
+      <div class="mx-auto grid max-w-page grid-cols-[1fr_auto_1fr] items-center gap-4 px-(--gutter) py-3 lg:py-4">
+        <div>
+          <button
+            class="flex h-10 w-10 flex-col items-center justify-center gap-1.5 border border-rule bg-transparent p-0 lg:hidden"
+            type="button"
+            aria-controls="nav-principal"
+            :aria-expanded="isMenuOpen"
+            :aria-label="isMenuOpen ? 'Cerrar menú' : 'Abrir menú'"
+            @click="toggleMenu"
+          >
+            <span class="block h-px w-4 bg-ink"></span>
+            <span class="block h-px w-4 bg-ink"></span>
+          </button>
+        </div>
+
+        <RouterLink to="/" class="block" @click="closeMenu">
+          <img :src="logoImage" alt="Turismo y ocio EG - Inicio" class="block h-20 w-auto lg:h-28" />
         </RouterLink>
 
-        <button
-          class="nav-toggle"
-          type="button"
-          :aria-expanded="isMenuOpen"
-          :aria-label="isMenuOpen ? 'Cerrar menú' : 'Abrir menú'"
-          @click="toggleMenu"
-        >
-          <span class="nav-toggle-bar"></span>
-          <span class="nav-toggle-bar"></span>
-          <span class="nav-toggle-bar"></span>
-        </button>
+        <p class="hidden justify-self-end text-right text-sm leading-relaxed text-ink-soft md:block">
+          Cultura, naturaleza y ocio<br />en Guinea Ecuatorial
+        </p>
+      </div>
 
-        <div class="nav-links" :class="{ open: isMenuOpen }">
-          <RouterLink to="/" class="nav-link" :class="{ 'nav-link-active': isHomeActive }" @click="closeMenu">Inicio</RouterLink>
-          <RouterLink to="#categorias" class="nav-link" :class="{ 'nav-link-active': route.hash === '#categorias' }" @click="closeMenu">Categorías</RouterLink>
-          <RouterLink to="#eventos" class="nav-link" :class="{ 'nav-link-active': route.hash === '#eventos' }" @click="closeMenu">Eventos</RouterLink>
-          <RouterLink to="#provincias" class="nav-link" :class="{ 'nav-link-active': route.hash === '#provincias' }" @click="closeMenu">Provincias</RouterLink>
-          <RouterLink to="#servicios" class="nav-link" :class="{ 'nav-link-active': route.hash === '#servicios' }" @click="closeMenu">Servicios</RouterLink>
-          <RouterLink to="/about" class="nav-link" :class="{ 'nav-link-active': route.path === '/about' }" @click="closeMenu">Acerca de</RouterLink>
+      <nav
+        id="nav-principal"
+        class="border-y border-rule lg:block"
+        :class="isMenuOpen ? 'block' : 'hidden'"
+        aria-label="Navegación principal"
+      >
+        <div class="mx-auto flex max-w-page flex-col px-(--gutter) lg:flex-row lg:justify-between">
+          <RouterLink
+            v-for="link in navLinks"
+            :key="link.label"
+            :to="link.to"
+            class="-mb-px border-b border-rule py-4 text-kicker font-medium uppercase tracking-kicker no-underline transition-colors hover:text-accent lg:border-b-2"
+            :class="isActive(link) ? 'text-accent lg:border-accent' : 'text-ink-soft lg:border-transparent'"
+            :aria-current="isActive(link) ? 'page' : undefined"
+            @click="closeMenu"
+          >
+            {{ link.label }}
+          </RouterLink>
         </div>
       </nav>
-      <div v-if="isMenuOpen" class="nav-backdrop" @click="closeMenu"></div>
     </header>
-    
+
     <main id="main-content" class="main">
       <RouterView />
     </main>
-    
-    <footer class="footer" :style="{ backgroundImage: `url(${bgFooterImage})` }">
-      <div class="footer-content">
-        <div class="footer-section">
-          <img :src="logoImage" alt="Turismo y ocio EG" class="footer-logo" />
-          <p>Descubre Guinea Ecuatorial - Cultura, Naturaleza y Tradición</p>
+
+    <footer class="relative z-10 border-t-2 border-ink bg-paper-alt text-ink">
+      <div class="mx-auto grid max-w-page gap-10 px-(--gutter) py-12 sm:grid-cols-2 lg:grid-cols-[2fr_1fr_1fr_1fr]">
+        <div>
+          <img :src="logoImage" alt="Turismo y ocio EG" class="-ml-3 block h-28 w-auto" />
+          <p class="mt-2 max-w-xs font-serif text-lead leading-snug text-ink-soft">
+            Descubre Guinea Ecuatorial: cultura, naturaleza y tradición.
+          </p>
         </div>
-        
-        <div class="footer-section">
-          <h4>Enlaces Rápidos</h4>
-          <ul>
-            <li><RouterLink to="/">Inicio</RouterLink></li>
-            <li><RouterLink to="/about">Acerca de</RouterLink></li>
-            <li><RouterLink to="/#servicios">Hospedaje</RouterLink></li>
-            <li><RouterLink to="/#servicios">Transporte</RouterLink></li>
+
+        <div>
+          <p class="mb-4 text-kicker font-medium uppercase tracking-kicker text-accent">Enlaces rápidos</p>
+          <ul class="flex list-none flex-col gap-3">
+            <li v-for="link in footerLinks" :key="link.label">
+              <RouterLink :to="link.to" class="font-serif text-ink no-underline transition-colors hover:text-accent">
+                {{ link.label }}
+              </RouterLink>
+            </li>
           </ul>
         </div>
-        
-        <div class="footer-section">
-          <h4>Síguenos</h4>
-          <div class="social-links">
-            <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
-              <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+
+        <div>
+          <p class="mb-4 text-kicker font-medium uppercase tracking-kicker text-accent">Síguenos</p>
+          <div class="flex gap-4">
+            <a class="text-ink-soft transition-colors hover:text-accent" href="https://facebook.com" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
+              <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
               </svg>
             </a>
-            <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" aria-label="Twitter">
-              <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+            <a class="text-ink-soft transition-colors hover:text-accent" href="https://twitter.com" target="_blank" rel="noopener noreferrer" aria-label="Twitter">
+              <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
               </svg>
             </a>
-            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
-              <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+            <a class="text-ink-soft transition-colors hover:text-accent" href="https://instagram.com" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+              <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
               </svg>
             </a>
-            <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" aria-label="YouTube">
-              <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+            <a class="text-ink-soft transition-colors hover:text-accent" href="https://youtube.com" target="_blank" rel="noopener noreferrer" aria-label="YouTube">
+              <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
               </svg>
             </a>
-          </div>
-          <div class="footer-dev">
-            <h4>Desarrollado por</h4>
-            <img :src="logo4tucode" alt="4tucode" />
+          
           </div>
         </div>
+
+        <div>
+          <p class="mb-4 text-kicker font-medium uppercase tracking-kicker text-accent">Desarrollado por</p>
+          <img :src="logo4tucode" alt="4tucode" class="block h-auto w-32 max-w-full" />
+        </div>
       </div>
-      
-      <div class="footer-bottom">
-        <p>&copy; 2026 Turismo y Ocio EG. Todos los derechos reservados.</p>
+
+      <div class="border-t border-rule">
+        <p class="mx-auto max-w-page px-(--gutter) py-5 text-kicker uppercase tracking-kicker text-ink-muted">
+          &copy; 2026 Turismo y Ocio EG. Todos los derechos reservados.
+        </p>
       </div>
     </footer>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { RouterLink, RouterView, useRoute } from 'vue-router'
 import logoImage from './assets/logo-nuevo.png'
-import bgFooterImage from './assets/bg-footer.png'
 import logo4tucode from './assets/4tucode.png'
+
+interface NavLink {
+  label: string
+  to: string
+}
+
+const navLinks: NavLink[] = [
+  { label: 'Inicio', to: '/' },
+  { label: 'Categorías', to: '/#categorias' },
+  { label: 'Eventos', to: '/#eventos' },
+  { label: 'Provincias', to: '/#provincias' },
+  { label: 'Servicios', to: '/#servicios' },
+  { label: 'Acerca de', to: '/about' }
+]
+
+const footerLinks: NavLink[] = [
+  { label: 'Inicio', to: '/' },
+  { label: 'Acerca de', to: '/about' },
+  { label: 'Hospedaje', to: '/#servicios' },
+  { label: 'Transporte', to: '/#servicios' }
+]
 
 const route = useRoute()
 const isMenuOpen = ref(false)
-const isScrolled = ref(false)
 
-const isHomeActive = computed(() => route.path === '/' && !route.hash)
+const today = new Date().toLocaleDateString('es-ES', {
+  weekday: 'long',
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric'
+})
+
+const isActive = (link: NavLink) => link.to === route.path + route.hash
 
 const toggleMenu = () => {
   isMenuOpen.value = !isMenuOpen.value
@@ -117,25 +173,8 @@ const handleKeydown = (e: KeyboardEvent) => {
   if (e.key === 'Escape' && isMenuOpen.value) closeMenu()
 }
 
-const handleScroll = () => {
-  isScrolled.value = window.scrollY > 40
-}
-
-watch(isMenuOpen, (open) => {
-  document.body.style.overflow = open ? 'hidden' : ''
-})
-
-onMounted(() => {
-  document.addEventListener('keydown', handleKeydown)
-  window.addEventListener('scroll', handleScroll, { passive: true })
-  handleScroll()
-})
-
-onUnmounted(() => {
-  document.removeEventListener('keydown', handleKeydown)
-  window.removeEventListener('scroll', handleScroll)
-  document.body.style.overflow = ''
-})
+onMounted(() => document.addEventListener('keydown', handleKeydown))
+onUnmounted(() => document.removeEventListener('keydown', handleKeydown))
 </script>
 
 <style scoped>
@@ -144,10 +183,9 @@ onUnmounted(() => {
   position: absolute;
   top: -100%;
   left: 0.75rem;
-  background: #2c3e50;
-  color: white;
+  background: var(--color-ink);
+  color: var(--color-paper);
   padding: 0.6rem 1rem;
-  border-radius: 0 0 8px 8px;
   font-weight: 600;
   font-size: 0.9rem;
   z-index: 9999;
@@ -157,7 +195,7 @@ onUnmounted(() => {
 
 .skip-link:focus {
   top: 0;
-  outline: 2px solid #fff;
+  outline: 2px solid var(--color-accent);
   outline-offset: 2px;
 }
 
@@ -167,376 +205,12 @@ onUnmounted(() => {
   flex-direction: column;
 }
 
-.header {
-  background-color: transparent;
-  color: white;
-  padding: 1rem 0;
-  box-shadow: none;
-  position: fixed;
-  width: 100%;
-  z-index: 10;
-  top: 0;
-  left: 0;
-  pointer-events: none;
-  transition: background-color 0.3s ease, box-shadow 0.3s ease;
-}
-
-.header::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.45), transparent);
-  pointer-events: none;
-  z-index: 0;
-  transition: opacity 0.3s ease;
-}
-
-.header--scrolled {
-  background-color: rgba(20, 20, 20, 0.92);
-  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.25);
-}
-
-.header--scrolled::before {
-  opacity: 0;
-}
-
-.nav {
-  pointer-events: auto;
-  /* max-width: 1200px; */
-  margin: 0 auto;
-  width: 100%;
-  padding: 0 2rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  position: relative;
-  z-index: 1;
-}
-
-.logo {
-  display: flex;
-  align-items: center;
-  gap: 0.65rem;
-  text-decoration: none;
-  height: 148px;
-  filter: drop-shadow(3px 3px 7px rgba(0,0,0,0.6));
-}
-
-.logo-img {
-  height: 148px;
-  width: auto;
-  object-fit: contain;
-}
-
-.logo-subtitle {
-  color: #fff;
-  font-size: 1rem;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.7);
-  white-space: nowrap;
-}
-
-.nav-links {
-  display: flex;
-  gap: 2rem;
-}
-
-.nav-toggle {
-  display: none;
-  flex-direction: column;
-  gap: 6px;
-  background: rgba(0, 0, 0, 0.25);
-  border: none;
-  border-radius: 5px;
-  padding: 0.6rem 0.75rem;
-  cursor: pointer;
-  transition: background 0.3s, transform 0.3s;
-  outline: none;
-}
-
-.nav-toggle:focus-visible {
-  outline: 2px solid rgba(255, 255, 255, 0.8);
-  outline-offset: 2px;
-}
-
-.nav-toggle:active {
-  transform: translateY(0);
-}
-
-.nav-toggle:hover {
-  background: rgba(0, 0, 0, 0.4);
-  transform: translateY(-1px);
-}
-
-.nav-toggle-bar {
-  width: 22px;
-  height: 2px;
-  background: #fff;
-  border-radius: 999px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
-}
-
-.nav-backdrop {
-  display: none;
-  pointer-events: auto;
-}
-
-.nav-links a {
-  color: white;
-  text-decoration: none;
-  font-weight: 500;
-  text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-  position: relative;
-  padding-bottom: 0.3rem;
-  transition: color 0.25s ease;
-}
-
-.nav-links a::after {
-  content: '';
-  position: absolute;
-  left: 0;
-  right: 100%;
-  bottom: 0;
-  height: 2px;
-  border-radius: 999px;
-  background: #f5a623;
-  transition: right 0.25s ease;
-}
-
-.nav-links a:hover {
-  color: #f5a623;
-}
-
-.nav-links a:hover::after,
-.nav-links a.nav-link-active::after {
-  right: 0;
-}
-
-.nav-links a.nav-link-active {
-  color: #f5a623;
-  text-shadow: 2px 2px 6px rgba(0,0,0,0.7);
-}
-
 .main {
   flex: 1;
   width: 100%;
   padding: 0;
-  background-color: #fff8f0;
+  background-color: var(--color-paper);
   position: relative;
   z-index: 5;
 }
-
-.footer {
-  background-color: #f5e6d3;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  color: #6b4423;
-  position: relative;
-  z-index: 10;
-}
-
-.footer-content {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 3rem 2rem 2rem;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 3rem;
-}
-
-.footer-section h3 {
-  margin-bottom: 1rem;
-  font-size: 1.5rem;
-}
-
-.footer-section h4 {
-  margin-bottom: 1rem;
-  font-size: 1.125rem;
-  color: #8b5a3c;
-}
-
-.footer-logo {
-  max-width: 180px;
-  height: auto;
-  margin-bottom: 1rem;
-  display: block;
-  filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.2));
-}
-
-.footer-section p {
-  color: #6b4423;
-  line-height: 1.6;
-  opacity: 0.9;
-}
-
-.footer-section ul {
-  list-style: none;
-  padding: 0;
-}
-
-.footer-section ul li {
-  margin-bottom: 0.75rem;
-}
-
-.footer-section ul li a {
-  color: #6b4423;
-  text-decoration: none;
-  transition: color 0.3s;
-  opacity: 0.9;
-}
-
-.footer-section ul li a:hover {
-  color: #c97a54;
-  opacity: 1;
-}
-
-.social-links {
-  display: flex;
-  gap: 1rem;
-}
-
-.social-links a {
-  color: #6b4423;
-  transition: color 0.3s, transform 0.3s;
-  display: inline-block;
-  opacity: 0.9;
-}
-
-.social-links a:hover {
-  color: #c97a54;
-  transform: translateY(-3px);
-  opacity: 1;
-}
-
-.footer-dev {
-  margin-top: 1.5rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-.footer-dev span {
-  font-size: 0.9rem;
-  color: #6b4423;
-  opacity: 0.9;
-}
-
-.footer-dev img {
-  width: 140px;
-  max-width: 100%;
-  height: auto;
-  filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.2));
-}
-
-.footer-bottom {
-  border-top: 1px solid rgba(107, 68, 35, 0.2);
-  padding: 1.5rem;
-  text-align: center;
-}
-
-.footer-bottom p {
-  color: #6b4423;
-  font-size: 0.875rem;
-  opacity: 0.7;
-}
-
-@media (max-width: 1024px) {
-  .header {
-    padding: 0.5rem 0;
-  }
-
-  .nav {
-    flex-direction: row;
-    gap: 1rem;
-    padding: 0 1.5rem;
-  }
-
-  .logo {
-    height: 100px;
-  }
-
-  .logo-img {
-    height: 100px;
-  }
-
-  .nav-links {
-    position: absolute;
-    top: calc(100% + 0.5rem);
-    right: 1rem;
-    left: 1rem;
-    flex-direction: column;
-    gap: 0.5rem;
-    padding: 1rem;
-    background: rgba(20, 20, 20, 0.92);
-    border-radius: 16px;
-    box-shadow: 0 16px 30px rgba(0, 0, 0, 0.3);
-    transform: translateY(-10px);
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.3s, transform 0.3s;
-    font-size: 0.95rem;
-    z-index: 15;
-  }
-
-  .nav-links.open {
-    opacity: 1;
-    transform: translateY(0);
-    pointer-events: auto;
-  }
-
-  .nav-links a {
-    padding: 0.6rem 0.75rem;
-    border-radius: 10px;
-  }
-
-  .nav-links a:hover {
-    background: rgba(255, 255, 255, 0.12);
-  }
-
-  .nav-links a.nav-link-active,
-  .nav-links a:active,
-  .nav-links a:focus {
-    background: transparent;
-  }
-
-  .nav-toggle {
-    display: flex;
-  }
-
-  .nav-backdrop {
-    display: block;
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.35);
-    z-index: 9;
-  }
-}
-
-@media (max-width: 480px) {
-  .header {
-    padding: 0.5rem 0;
-  }
-
-  .nav {
-    padding: 0 0.75rem;
-  }
-
-  .logo {
-    height: 70px;
-    gap: 0.4rem;
-  }
-
-  .logo-img {
-    height: 70px;
-  }
-
-  .logo-subtitle {
-    display: none;
-  }
-}
 </style>
-

@@ -26,6 +26,8 @@ export interface Article {
   date: string
   imageUrl?: string
   imagePath?: string
+  imageCredit?: string
+  imageCreditUrl?: string
   location?: string
   createdAt?: any
   updatedAt?: any
@@ -37,6 +39,8 @@ export interface ArticleFormData {
   date: string
   content: string
   imageFile?: File
+  imageCredit?: string
+  imageCreditUrl?: string
 }
 
 // Generar slug a partir del título
@@ -143,6 +147,8 @@ export async function createArticle(data: ArticleFormData): Promise<void> {
     date: Timestamp.fromDate(new Date(data.date)),
     imageUrl,
     imagePath,
+    imageCredit: data.imageCredit?.trim() || '',
+    imageCreditUrl: data.imageCreditUrl?.trim() || '',
     createdAt: serverTimestamp(), // Usar serverTimestamp para consistencia
     updatedAt: serverTimestamp()
   }
@@ -169,6 +175,8 @@ export async function getAllArticles(): Promise<Article[]> {
         date: data.date?.toDate ? data.date.toDate().toISOString().split('T')[0] : (data.date || ''),
         imageUrl: data.imageUrl || '',
         imagePath: data.imagePath || '',
+        imageCredit: data.imageCredit || '',
+        imageCreditUrl: data.imageCreditUrl || '',
         createdAt: data.createdAt,
         updatedAt: data.updatedAt
       }
@@ -189,6 +197,8 @@ export async function getAllArticles(): Promise<Article[]> {
           date: data.date?.toDate ? data.date.toDate().toISOString().split('T')[0] : (data.date || ''),
         imageUrl: data.imageUrl || '',
         imagePath: data.imagePath || '',
+        imageCredit: data.imageCredit || '',
+        imageCreditUrl: data.imageCreditUrl || '',
         createdAt: data.createdAt,
         updatedAt: data.updatedAt
         }
@@ -232,6 +242,8 @@ const mapArticle = (docSnap: any): Article => {
     date: data.date?.toDate ? data.date.toDate().toISOString().split('T')[0] : (data.date || ''),
     imageUrl: data.imageUrl || '',
     imagePath: data.imagePath || '',
+    imageCredit: data.imageCredit || '',
+    imageCreditUrl: data.imageCreditUrl || '',
     location: data.location || '',
     createdAt: data.createdAt,
     updatedAt: data.updatedAt
@@ -360,6 +372,8 @@ export async function updateArticle(
     updateData.imageUrl = uploadResult.url
     updateData.imagePath = uploadResult.path
   }
+  if (data.imageCredit !== undefined) updateData.imageCredit = data.imageCredit.trim()
+  if (data.imageCreditUrl !== undefined) updateData.imageCreditUrl = data.imageCreditUrl.trim()
 
   await updateDoc(articleRef, updateData)
 }

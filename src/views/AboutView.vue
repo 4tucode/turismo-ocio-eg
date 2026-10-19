@@ -1,234 +1,168 @@
 <template>
-  <div class="about">
-    <div class="about-hero">
-      <div class="about-hero-content">
-        <p class="about-eyebrow">Sobre la autora</p>
-        <h1>Acerca de Silvia</h1>
-        <p class="about-lead">
-          Periodista y narradora de viajes. Aquí convierto historias locales en rutas,
-          experiencias y recomendaciones que te acercan a Guinea Ecuatorial con mirada
-          auténtica.
+  <article class="mx-auto max-w-page px-(--gutter) pt-10 pb-20">
+    <header class="[border-bottom:4px_double_var(--color-ink)] pb-10">
+      <nav class="mb-8 text-kicker font-medium uppercase tracking-kicker text-ink-muted" aria-label="Migas de pan">
+        <RouterLink to="/" class="text-ink-muted no-underline hover:text-accent">Inicio</RouterLink>
+        <span class="mx-2" aria-hidden="true">/</span>
+        <span class="text-accent" aria-current="page">Acerca de</span>
+      </nav>
+
+      <div class="mx-auto max-w-[52rem] text-center">
+        <p class="mb-4 text-kicker font-medium uppercase tracking-kicker text-accent">La autora</p>
+        <h1 class="text-[clamp(2.5rem,6vw,4.75rem)] leading-[1.02]">Historias que conectan personas y lugares</h1>
+        <p class="mx-auto mt-6 max-w-2xl font-serif text-[1.375rem] leading-snug text-ink-soft">
+          Periodista y narradora de viajes, Silvia convierte historias locales en rutas, experiencias y
+          recomendaciones para acercarse a Guinea Ecuatorial con una mirada auténtica.
+        </p>
+        <p
+          class="mx-auto mt-8 flex max-w-xl flex-wrap items-center justify-center gap-x-4 gap-y-1 border-y border-rule py-3 text-kicker font-medium uppercase tracking-kicker text-ink-muted"
+        >
+          <span>Por <span class="text-ink">Silvia</span></span>
+          <span aria-hidden="true">·</span>
+          <span>Periodista</span>
+          <span aria-hidden="true">·</span>
+          <span>Cultura y turismo</span>
         </p>
       </div>
-      <div class="about-hero-card">
-        <div class="avatar">
-          <img src="https://ui-avatars.com/api/?name=Silvia&size=200&background=667eea&color=fff" alt="Silvia" />
-        </div>
-        <div class="profile-info">
-          <h2>Silvia</h2>
-          <p class="subtitle">Periodista · Cultura y turismo</p>
-        </div>
+    </header>
+
+    <div class="grid gap-x-16 gap-y-14 pt-12 lg:grid-cols-[8fr_4fr]">
+      <div class="about-body mx-auto w-full max-w-[42rem] lg:mx-0">
+        <h2>Quién es Silvia</h2>
+        <p class="drop-cap">
+          Silvia es una entusiasta de las historias que conectan personas y lugares. Su formación en
+          Periodismo le dio las herramientas para investigar, escuchar y contar con rigor lo que hace
+          especial cada destino.
+        </p>
+
+        <blockquote>
+          <p>«Historias locales convertidas en rutas, experiencias y recomendaciones.»</p>
+        </blockquote>
+
+        <h2>Qué encontrarás en este blog</h2>
+        <p>
+          Este rincón digital no es solo una colección de guías de destinos. Su objetivo es ayudarte a
+          planificar el viaje con confianza, a partir de datos reales, cultura viva y recomendaciones
+          locales.
+        </p>
+
+        <h2>Fuera de la redacción</h2>
+        <p>
+          Cuando no está escribiendo o editando fotos, lo más probable es encontrarla paseando por
+          mercados, conversando con artesanos o buscando el café perfecto.
+        </p>
       </div>
+
+      <aside class="lg:col-start-2" aria-labelledby="ficha">
+        <div class="border-t-4 border-ink bg-paper-alt p-6">
+          <h2 id="ficha" class="text-kicker font-sans font-medium uppercase tracking-kicker text-ink">Ficha</h2>
+          <div class="mt-5 flex items-center gap-4 border-b border-rule pb-5">
+            <span
+              class="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-ink font-display text-3xl text-paper"
+              aria-hidden="true"
+            >
+              S
+            </span>
+            <div>
+              <p class="font-display text-2xl leading-tight">Silvia</p>
+              <p class="mt-1 text-sm text-ink-soft">Periodista · Cultura y turismo</p>
+            </div>
+          </div>
+
+          <h3 class="mt-5 text-kicker font-sans font-medium uppercase tracking-kicker text-ink-muted">Escribe sobre</h3>
+          <ul class="mt-2 list-none">
+            <li v-for="section in sections" :key="section.to" class="border-b border-rule last:border-b-0">
+              <RouterLink :to="section.to" class="group flex items-baseline justify-between gap-4 py-3 text-ink no-underline">
+                <span class="font-serif text-lg transition-colors group-hover:text-accent">{{ section.label }}</span>
+                <span class="text-ink-muted transition-colors group-hover:text-accent" aria-hidden="true">→</span>
+              </RouterLink>
+            </li>
+          </ul>
+        </div>
+      </aside>
     </div>
-    
-    <div class="about-content">
-      <div class="about-grid">
-        <section class="about-card">
-          <h3>Quién es Silvia</h3>
-          <p>
-            Soy Silvia, una entusiasta de las historias que conectan personas y lugares.
-            Mi formación en Periodismo me dio las herramientas para investigar, escuchar
-            y contar con rigor lo que hace especial cada destino.
-          </p>
-        </section>
 
-        <section class="about-card">
-          <h3>Qué ofrece el blog</h3>
-          <p>
-            En este rincón digital no solo encontrarás guías de destinos. Mi objetivo es
-            ayudarte a planificar tu viaje con confianza, con datos reales, cultura viva y
-            recomendaciones locales.
-          </p>
-        </section>
-
-        <section class="about-card">
-          <h3>Un toque personal</h3>
-          <p>
-            Cuando no estoy escribiendo aquí o editando fotos, probablemente me encuentres
-            paseando por mercados, conversando con artesanos o buscando el café perfecto.
-          </p>
-        </section>
-
-        <section class="about-card highlight">
-          <h3>Llamada a la acción</h3>
-          <p>
-            ¿Te unes a la aventura? No te pierdas nada y acompáñame en cada ruta, historia
-            y descubrimiento.
-          </p>
-          <RouterLink to="/" class="cta-button">Explorar el blog</RouterLink>
-        </section>
-      </div>
-    </div>
-  </div>
+    <section
+      class="mt-20 border-y border-ink py-12 text-center"
+      aria-labelledby="acompaname"
+    >
+      <p class="mb-3 text-kicker font-medium uppercase tracking-kicker text-accent">Sigue leyendo</p>
+      <h2 id="acompaname" class="text-h2 leading-none">¿Te unes a la aventura?</h2>
+      <p class="mx-auto mt-5 max-w-lg font-serif text-lead leading-snug text-ink-soft">
+        No te pierdas nada y acompáñala en cada ruta, historia y descubrimiento.
+      </p>
+      <RouterLink
+        to="/"
+        class="mt-8 inline-flex items-center gap-2 bg-ink px-6 py-3 text-kicker font-medium uppercase tracking-kicker text-paper no-underline transition-colors hover:bg-accent"
+      >
+        Explorar el blog <span aria-hidden="true">→</span>
+      </RouterLink>
+    </section>
+  </article>
 </template>
 
 <script setup lang="ts">
+import { RouterLink } from 'vue-router'
+
+const sections = [
+  { label: 'Cultura e Historia', to: '/cultura' },
+  { label: 'Naturaleza y Aventura', to: '/naturaleza' },
+  { label: 'Gastronomía', to: '/gastronomia' },
+  { label: 'Ocio y Entretenimiento', to: '/ocio' }
+]
 </script>
 
 <style scoped>
-.about {
-  width: 100%;
-  margin: 0;
-  box-sizing: border-box;
-  padding: 130px 2rem 3rem;
-  background: #454545;
+/* Mismo tratamiento de texto que el cuerpo de los artículos */
+.about-body {
+  font-family: var(--font-body);
+  font-size: 1.1875rem;
+  line-height: 1.75;
 }
 
-.about-hero {
-  display: grid;
-  grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
-  gap: 2.5rem;
-  align-items: center;
-  margin-bottom: 3rem;
+.about-body p {
+  margin-bottom: 1.5em;
 }
 
-.about-hero-content {
-  padding: 0;
+.about-body h2 {
+  margin: 2.4em 0 0.7em;
+  font-size: 2rem;
+  line-height: 1.15;
 }
 
-.about-eyebrow {
-  text-transform: uppercase;
-  letter-spacing: 0.2rem;
-  font-size: 0.7rem;
-  color: rgba(255, 255, 255, 0.7);
-  margin: 0 0 0.75rem 0;
-  font-weight: 600;
+.about-body h2:first-child {
+  margin-top: 0;
 }
 
-.about-hero-content h1 {
-  font-size: 3rem;
-  color: #ffffff;
-  margin: 0 0 1rem 0;
+.drop-cap::first-letter {
+  float: left;
+  margin: 0.08em 0.12em 0 0;
+  font-family: var(--font-display);
+  font-size: 4.6em;
+  line-height: 0.8;
+  color: var(--color-accent);
 }
 
-.about-lead {
-  font-size: 1.2rem;
-  color: rgba(255, 255, 255, 0.78);
-  line-height: 1.7;
-  margin: 0;
+.about-body blockquote {
+  margin: 2.25em 0;
+  padding: 0.25em 0 0.25em 1.25em;
+  border-left: 3px solid var(--color-accent);
+  font-size: 1.45rem;
+  font-style: italic;
+  line-height: 1.4;
 }
 
-.about-hero-card {
-  text-align: center;
-}
-
-.avatar {
-  width: 160px;
-  height: 160px;
-  margin: 0 auto 1rem;
-  border-radius: 50%;
-  overflow: hidden;
-  border: 4px solid rgba(255, 255, 255, 0.7);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
-}
-
-.avatar img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.profile-info h2 {
-  margin: 0 0 0.5rem 0;
-  color: #ffffff;
-  font-size: 1.6rem;
-}
-
-.subtitle {
-  color: rgba(255, 255, 255, 0.75);
-  font-size: 1rem;
-}
-
-.about-content {
-  padding: 0;
-  margin-top: 2.5rem;
-}
-
-.about-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 2rem;
-}
-
-.about-card {
-  padding: 0;
-  background: transparent;
-  border: none;
-  box-shadow: none;
-}
-
-.about-card h3 {
-  color: #ffffff;
-  margin: 0 0 1rem 0;
-  font-size: 1.35rem;
-}
-
-.about-card p {
-  color: rgba(255, 255, 255, 0.78);
-  line-height: 1.7;
+.about-body blockquote p {
   margin: 0;
 }
 
-.about-card.highlight {
-  background: transparent;
-  border: none;
-}
-
-.cta-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  margin-top: 1.5rem;
-  padding: 0.75rem 1.5rem;
-  background: #ffffff;
-  color: #1f2937;
-  text-decoration: none;
-  border-radius: 999px;
-  font-weight: 600;
-  transition: transform 0.3s, box-shadow 0.3s;
-}
-
-.cta-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 24px rgba(31, 41, 55, 0.25);
-}
-
-@media (max-width: 900px) {
-  .about-hero {
-    grid-template-columns: 1fr;
+@media (max-width: 640px) {
+  .about-body {
+    font-size: 1.0625rem;
   }
 
-  .about-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-@media (max-width: 768px) {
-  .about {
-    padding: 120px 1rem 2rem;
-  }
-
-  .about-hero-content h1 {
-    font-size: 2.3rem;
-  }
-
-  .about-content {
-    padding: 0;
-  }
-}
-
-@media (max-width: 480px) {
-  .about-hero-content h1 {
-    font-size: 2rem;
-  }
-
-  .about-lead {
-    font-size: 1.05rem;
-  }
-
-  .about-card h3 {
-    font-size: 1.2rem;
+  .about-body blockquote {
+    font-size: 1.25rem;
   }
 }
 </style>
-

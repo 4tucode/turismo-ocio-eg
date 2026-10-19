@@ -3,7 +3,6 @@ import HomeView from '../views/HomeView.vue'
 import PostView from '../views/PostView.vue'
 import AboutView from '../views/AboutView.vue'
 import CulturaHistoriaView from '../views/CulturaHistoriaView.vue'
-import CulturaArticleView from '../views/CulturaArticleView.vue'
 import GastronomiaView from '../views/GastronomiaView.vue'
 import NaturalezaView from '../views/NaturalezaView.vue'
 import OcioView from '../views/OcioView.vue'
@@ -46,7 +45,7 @@ const router = createRouter({
     {
       path: '/cultura/:slug',
       name: 'cultura-article',
-      component: CulturaArticleView
+      component: PostView
     },
     {
       path: '/gastronomia',
@@ -56,7 +55,7 @@ const router = createRouter({
     {
       path: '/gastronomia/:slug',
       name: 'gastronomia-article',
-      component: CulturaArticleView
+      component: PostView
     },
     {
       path: '/naturaleza',
@@ -66,7 +65,7 @@ const router = createRouter({
     {
       path: '/naturaleza/:slug',
       name: 'naturaleza-article',
-      component: CulturaArticleView
+      component: PostView
     },
     {
       path: '/ocio',
@@ -76,7 +75,7 @@ const router = createRouter({
     {
       path: '/ocio/:slug',
       name: 'ocio-article',
-      component: CulturaArticleView
+      component: PostView
     },
     {
       path: '/provincia/:slug',

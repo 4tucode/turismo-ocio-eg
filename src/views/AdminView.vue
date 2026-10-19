@@ -189,6 +189,29 @@
               </div>
             </div>
 
+            <div class="form-group">
+              <label for="imageCredit">Crédito de la foto</label>
+              <input
+                id="imageCredit"
+                v-model="formData.imageCredit"
+                type="text"
+                class="form-input"
+                placeholder="Ej.: Kachelus / Wikimedia Commons (CC BY-SA 4.0)"
+              />
+              <small class="form-help">Autor y licencia. Se muestra como pie de foto bajo la imagen de portada.</small>
+            </div>
+
+            <div class="form-group">
+              <label for="imageCreditUrl">Enlace de la fuente (opcional)</label>
+              <input
+                id="imageCreditUrl"
+                v-model="formData.imageCreditUrl"
+                type="url"
+                class="form-input"
+                placeholder="https://commons.wikimedia.org/wiki/File:…"
+              />
+            </div>
+
             <div class="form-actions">
               <button type="submit" class="btn-primary" :disabled="isSubmitting || isUploading || isCompressing">
                 <span v-if="isCompressing">Comprimiendo imagen...</span>
@@ -488,7 +511,9 @@ const formData = reactive<ArticleFormData>({
   category: 'cultura' as ArticleFormData['category'],
   date: new Date().toISOString().split('T')[0],
   content: '',
-  imageFile: undefined
+  imageFile: undefined,
+  imageCredit: '',
+  imageCreditUrl: ''
 })
 
 const editor = useEditor({
@@ -614,6 +639,8 @@ const resetForm = () => {
   formData.date = new Date().toISOString().split('T')[0]
   formData.content = ''
   formData.imageFile = undefined
+  formData.imageCredit = ''
+  formData.imageCreditUrl = ''
   editingArticle.value = null
   submitError.value = ''
   submitSuccess.value = ''
@@ -715,6 +742,8 @@ const editArticle = (article: Article) => {
   formData.date = article.date || new Date().toISOString().split('T')[0]
   formData.content = article.content
   formData.imageFile = undefined
+  formData.imageCredit = article.imageCredit || ''
+  formData.imageCreditUrl = article.imageCreditUrl || ''
   editor.value?.commands.setContent(article.content || '')
 
   document.querySelector('.admin-main')?.scrollIntoView({ behavior: 'smooth' })
@@ -1076,7 +1105,6 @@ onMounted(() => {
 .admin-panel {
   min-height: 100vh;
   background: linear-gradient(135deg, #0f172a 0%, #1e293b 45%, #0f172a 100%);
-  padding-top: 120px;
 }
 
 .admin-header {
