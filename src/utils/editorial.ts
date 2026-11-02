@@ -8,12 +8,21 @@ export const CATEGORY_LABELS: Record<Article['category'], string> = {
   noticias: 'Noticias'
 }
 
+// Nombre completo de cada portada de sección, en mayúscula solo la primera palabra
+export const SECTIONS: { category: Article['category']; label: string; to: string }[] = [
+  { category: 'noticias', label: 'Noticias y actualidad', to: '/noticias' },
+  { category: 'cultura', label: 'Cultura e historia', to: '/cultura' },
+  { category: 'naturaleza', label: 'Naturaleza y aventura', to: '/naturaleza' },
+  { category: 'gastronomia', label: 'Gastronomía', to: '/gastronomia' },
+  { category: 'ocio', label: 'Ocio y entretenimiento', to: '/ocio' }
+]
+
 export const categoryLabel = (category?: string) =>
   (category && CATEGORY_LABELS[category as Article['category']]) || 'Actualidad'
 
-// Ruta de la portada de sección; 'noticias' no tiene página propia
+// Ruta de la portada de sección
 export const categoryPath = (category?: string) =>
-  category && category !== 'noticias' && category in CATEGORY_LABELS ? `/${category}` : '/'
+  category && category in CATEGORY_LABELS ? `/${category}` : '/'
 
 export const formatLongDate = (value?: string) => {
   if (!value) return ''

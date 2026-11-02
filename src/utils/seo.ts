@@ -13,7 +13,7 @@ const defaults = {
   description: document.querySelector('meta[name="description"]')?.getAttribute('content') ?? ''
 }
 
-// Ruta única de cada artículo: /{categoría}/{slug}, salvo 'noticias', que no tiene sección y usa /post/{slug}
+// Ruta única de cada artículo: /{categoría}/{slug}; sin categoría conocida, /post/{slug}
 export const articlePath = (article: Pick<Article, 'category' | 'slug'>) =>
   categoryPath(article.category) === '/' ? `/post/${article.slug}` : `/${article.category}/${article.slug}`
 

@@ -1,7 +1,7 @@
 <template>
   <SectionFront
     category="naturaleza"
-    title="Naturaleza y Aventura"
+    title="Naturaleza y aventura"
     description="Selva, volcanes, playas y fauna única: la biodiversidad y los paisajes de Guinea Ecuatorial."
   />
 </template>

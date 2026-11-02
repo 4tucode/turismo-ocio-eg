@@ -148,14 +148,14 @@ const portadaSlides = computed<Slide[]>(() => [
   {
     id: 2,
     imageUrl: portada2Image,
-    title: 'Cultura y Tradición',
+    title: 'Cultura y tradición',
     subtitle: 'Un legado ancestral vivo',
     link: '/post/cultura-guinea'
   },
   {
     id: 3,
     imageUrl: portada3Image,
-    title: 'Naturaleza Exuberante',
+    title: 'Naturaleza exuberante',
     subtitle: 'Biodiversidad única en el mundo',
     link: '/post/naturaleza-guinea'
   }

@@ -1,7 +1,7 @@
 <template>
   <SectionFront
     category="cultura"
-    title="Cultura e Historia"
+    title="Cultura e historia"
     description="Pueblos, lenguas, memoria y patrimonio: la herencia cultural y los lugares históricos de Guinea Ecuatorial."
   />
 </template>

@@ -67,7 +67,8 @@
 import { computed } from 'vue'
 import { RouterLink } from 'vue-router'
 import type { Article } from '../services/articleService'
-import culturaImage from '../assets/cultura.webp'
+// Fotos fijas de cada sección: para cambiarlas basta con sustituir estas importaciones
+import culturaImage from '../assets/portad3.jpg'
 import naturalezaImage from '../assets/naturaleza.jpg'
 import gastronomiaImage from '../assets/comidaguineana.jpg'
 import ocioImage from '../assets/paseo.jpg'
@@ -84,7 +85,7 @@ const baseSections = [
     to: '/cultura',
     kicker: 'Cultura',
     short: 'cultura',
-    title: 'Cultura e Historia',
+    title: 'Cultura e historia',
     description: 'Pueblos, lenguas y memoria: las tradiciones que explican el país.',
     image: culturaImage
   },
@@ -93,7 +94,7 @@ const baseSections = [
     to: '/naturaleza',
     kicker: 'Naturaleza',
     short: 'naturaleza',
-    title: 'Naturaleza y Aventura',
+    title: 'Naturaleza y aventura',
     description: 'Selva, volcanes y playas vírgenes para recorrer sin prisa.',
     image: naturalezaImage
   },
@@ -111,7 +112,7 @@ const baseSections = [
     to: '/ocio',
     kicker: 'Ocio',
     short: 'ocio',
-    title: 'Ocio y Entretenimiento',
+    title: 'Ocio y entretenimiento',
     description: 'Planes, paseos y vida nocturna para después de la ruta.',
     image: ocioImage
   }
@@ -122,7 +123,6 @@ const sections = computed(() =>
     const sectionArticles = props.articles.filter((article) => article.category === section.key)
     return {
       ...section,
-      image: sectionArticles.find((article) => article.imageUrl)?.imageUrl ?? section.image,
       headlines: sectionArticles.slice(0, HEADLINES_PER_SECTION)
     }
   })

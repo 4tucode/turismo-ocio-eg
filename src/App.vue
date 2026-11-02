@@ -61,7 +61,7 @@
     </main>
 
     <footer class="relative z-10 border-t-2 border-ink bg-paper-alt text-ink">
-      <div class="mx-auto grid max-w-page gap-10 px-(--gutter) py-12 sm:grid-cols-2 lg:grid-cols-[2fr_1fr_1fr_1fr]">
+      <div class="mx-auto grid max-w-page gap-10 px-(--gutter) py-12 sm:grid-cols-2 lg:grid-cols-[1.4fr_0.9fr_1fr_1.5fr_1fr]">
         <div>
           <img :src="logoImage" alt="Turismo y ocio EG" class="-ml-3 block h-28 w-auto" />
           <p class="mt-2 max-w-xs font-serif text-lead leading-snug text-ink-soft">
@@ -107,6 +107,29 @@
           </div>
         </div>
 
+        <div v-if="CONTACT.phone || CONTACT.email">
+          <p class="mb-4 text-kicker font-medium uppercase tracking-kicker text-accent">Contacto</p>
+          <ul class="flex list-none flex-col gap-3">
+            <li v-if="CONTACT.phone">
+              <a :href="phoneHref(CONTACT.phone)" class="group flex items-center gap-3 font-serif text-ink no-underline transition-colors hover:text-accent">
+                <svg class="shrink-0 text-ink-soft group-hover:text-accent" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z" />
+                </svg>
+                <span><span class="sr-only">Teléfono: </span>{{ CONTACT.phone }}</span>
+              </a>
+            </li>
+            <li v-if="CONTACT.email">
+              <a :href="`mailto:${CONTACT.email}`" class="group flex items-center gap-3 font-serif text-ink no-underline transition-colors hover:text-accent">
+                <svg class="shrink-0 text-ink-soft group-hover:text-accent" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true">
+                  <rect x="2" y="4" width="20" height="16" rx="1" />
+                  <path d="m2 6 10 7 10-7" />
+                </svg>
+                <span class="[overflow-wrap:anywhere]"><span class="sr-only">Correo electrónico: </span>{{ CONTACT.email }}</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+
         <div>
           <p class="mb-4 text-kicker font-medium uppercase tracking-kicker text-accent">Desarrollado por</p>
           <img :src="logo4tucode" alt="4tucode" class="block h-auto w-32 max-w-full" />
@@ -127,6 +150,7 @@ import { ref, onMounted, onUnmounted } from 'vue'
 import { RouterLink, RouterView, useRoute } from 'vue-router'
 import logoImage from './assets/logo-nuevo.png'
 import logo4tucode from './assets/4tucode.png'
+import { CONTACT, phoneHref } from './config/contact'
 
 interface NavLink {
   label: string
@@ -135,6 +159,7 @@ interface NavLink {
 
 const navLinks: NavLink[] = [
   { label: 'Inicio', to: '/' },
+  { label: 'Noticias', to: '/noticias' },
   { label: 'Categorías', to: '/#categorias' },
   { label: 'Eventos', to: '/#eventos' },
   { label: 'Provincias', to: '/#provincias' },
@@ -144,6 +169,7 @@ const navLinks: NavLink[] = [
 
 const footerLinks: NavLink[] = [
   { label: 'Inicio', to: '/' },
+  { label: 'Noticias', to: '/noticias' },
   { label: 'Acerca de', to: '/about' },
   { label: 'Hospedaje', to: '/#servicios' },
   { label: 'Transporte', to: '/#servicios' }
@@ -159,7 +185,10 @@ const today = new Date().toLocaleDateString('es-ES', {
   year: 'numeric'
 })
 
-const isActive = (link: NavLink) => link.to === route.path + route.hash
+// Las secciones con página propia siguen marcadas dentro de sus artículos (/noticias/…)
+const isActive = (link: NavLink) =>
+  link.to === route.path + route.hash ||
+  (link.to !== '/' && !link.to.includes('#') && route.path.startsWith(`${link.to}/`))
 
 const toggleMenu = () => {
   isMenuOpen.value = !isMenuOpen.value

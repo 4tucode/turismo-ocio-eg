@@ -103,13 +103,7 @@
 
 <script setup lang="ts">
 import { RouterLink } from 'vue-router'
-
-const sections = [
-  { label: 'Cultura e Historia', to: '/cultura' },
-  { label: 'Naturaleza y Aventura', to: '/naturaleza' },
-  { label: 'Gastronomía', to: '/gastronomia' },
-  { label: 'Ocio y Entretenimiento', to: '/ocio' }
-]
+import { SECTIONS as sections } from '../utils/editorial'
 </script>
 
 <style scoped>

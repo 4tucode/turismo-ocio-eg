@@ -6,6 +6,7 @@ import CulturaHistoriaView from '../views/CulturaHistoriaView.vue'
 import GastronomiaView from '../views/GastronomiaView.vue'
 import NaturalezaView from '../views/NaturalezaView.vue'
 import OcioView from '../views/OcioView.vue'
+import NoticiasView from '../views/NoticiasView.vue'
 import ProvinceView from '../views/ProvinceView.vue'
 import AdminView from '../views/AdminView.vue'
 import EventCategoryView from '../views/EventCategoryView.vue'
@@ -75,6 +76,16 @@ const router = createRouter({
     {
       path: '/ocio/:slug',
       name: 'ocio-article',
+      component: PostView
+    },
+    {
+      path: '/noticias',
+      name: 'noticias',
+      component: NoticiasView
+    },
+    {
+      path: '/noticias/:slug',
+      name: 'noticias-article',
       component: PostView
     },
     {

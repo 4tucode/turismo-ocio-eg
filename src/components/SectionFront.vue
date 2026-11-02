@@ -61,8 +61,8 @@
         </div>
       </div>
 
-      <!-- Resto + otras secciones -->
-      <div class="grid gap-x-16 gap-y-12 pt-10 lg:grid-cols-[8fr_4fr]">
+      <!-- Resto + columna lateral -->
+      <div class="grid items-start gap-x-16 gap-y-12 pt-10 lg:grid-cols-[8fr_4fr]">
         <section v-if="rest.length > 0" aria-labelledby="mas-en-seccion">
           <h2 id="mas-en-seccion" class="mb-2 text-kicker font-sans font-medium uppercase tracking-kicker text-ink">
             Más en {{ title }}
@@ -74,22 +74,49 @@
           </ul>
         </section>
 
-        <aside class="lg:col-start-2" aria-labelledby="otras-secciones">
-          <h2 id="otras-secciones" class="mb-2 text-kicker font-sans font-medium uppercase tracking-kicker text-ink">
-            Otras secciones
+        <!-- Con pocos artículos en la sección, la columna principal se llena con lo último del resto de la web -->
+        <section v-else-if="elsewhere.length > 0" aria-labelledby="lo-ultimo">
+          <h2 id="lo-ultimo" class="mb-2 text-kicker font-sans font-medium uppercase tracking-kicker text-ink">
+            Lo último en otras secciones
           </h2>
           <ul class="list-none border-t border-ink">
-            <li v-for="section in otherSections" :key="section.to" class="border-b border-rule">
-              <RouterLink
-                :to="section.to"
-                class="group flex items-baseline justify-between gap-4 py-4 text-ink no-underline"
-              >
-                <span class="font-display text-2xl transition-colors group-hover:text-accent">{{ section.label }}</span>
-                <span class="text-ink-muted transition-colors group-hover:text-accent" aria-hidden="true">→</span>
-              </RouterLink>
+            <li v-for="article in elsewhere.slice(0, MAIN_ELSEWHERE_COUNT)" :key="article.id" class="border-b border-rule py-6">
+              <StoryCard :article="article" :to="articlePath(article)" variant="row" />
             </li>
           </ul>
-        </aside>
+        </section>
+
+        <div class="flex flex-col gap-12 lg:sticky lg:top-6 lg:col-start-2">
+          <section aria-labelledby="otras-secciones">
+            <h2 id="otras-secciones" class="mb-2 text-kicker font-sans font-medium uppercase tracking-kicker text-ink">
+              Otras secciones
+            </h2>
+            <ul class="list-none border-t border-ink">
+              <li v-for="section in otherSections" :key="section.to" class="border-b border-rule">
+                <RouterLink
+                  :to="section.to"
+                  class="group flex items-baseline justify-between gap-4 py-4 text-ink no-underline"
+                >
+                  <span class="font-display text-2xl transition-colors group-hover:text-accent">{{ section.label }}</span>
+                  <span class="text-ink-muted transition-colors group-hover:text-accent" aria-hidden="true">→</span>
+                </RouterLink>
+              </li>
+            </ul>
+          </section>
+
+          <AdSlot />
+
+          <section v-if="rest.length > 0 && elsewhere.length > 0" aria-labelledby="lo-ultimo-lateral">
+            <h2 id="lo-ultimo-lateral" class="mb-2 text-kicker font-sans font-medium uppercase tracking-kicker text-ink">
+              Lo último en la web
+            </h2>
+            <ul class="list-none border-t border-ink">
+              <li v-for="article in elsewhere.slice(0, ASIDE_ELSEWHERE_COUNT)" :key="article.id" class="border-b border-rule py-4">
+                <StoryCard :article="article" :to="articlePath(article)" variant="compact" />
+              </li>
+            </ul>
+          </section>
+        </div>
       </div>
     </template>
   </div>
@@ -99,45 +126,51 @@
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { RouterLink } from 'vue-router'
 import type { Article } from '../services/articleService'
-import { subscribeArticlesByCategory } from '../services/articleService'
+import { subscribeAllArticles, subscribeArticlesByCategory } from '../services/articleService'
+import { SECTIONS } from '../utils/editorial'
+import { articlePath } from '../utils/seo'
 import StoryCard from './StoryCard.vue'
+import AdSlot from './AdSlot.vue'
 
 const SECONDARY_COUNT = 3
-
-const SECTIONS = [
-  { category: 'cultura', label: 'Cultura e Historia', to: '/cultura' },
-  { category: 'naturaleza', label: 'Naturaleza y Aventura', to: '/naturaleza' },
-  { category: 'gastronomia', label: 'Gastronomía', to: '/gastronomia' },
-  { category: 'ocio', label: 'Ocio y Entretenimiento', to: '/ocio' }
-]
+const MAIN_ELSEWHERE_COUNT = 5
+const ASIDE_ELSEWHERE_COUNT = 4
 
 const props = defineProps<{
-  category: 'cultura' | 'naturaleza' | 'gastronomia' | 'ocio'
+  category: Article['category']
   title: string
   description: string
 }>()
 
 const articles = ref<Article[]>([])
+const allArticles = ref<Article[]>([])
 const loading = ref(true)
-let unsubscribe: (() => void) | null = null
+const unsubscribers: (() => void)[] = []
 
 // La plantilla solo usa `lead` cuando hay artículos
 const lead = computed(() => articles.value[0] as Article)
 const secondary = computed(() => articles.value.slice(1, 1 + SECONDARY_COUNT))
 const rest = computed(() => articles.value.slice(1 + SECONDARY_COUNT))
 
+const elsewhere = computed(() => allArticles.value.filter((article) => article.category !== props.category))
+
 const otherSections = computed(() => SECTIONS.filter((section) => section.category !== props.category))
 
 const linkTo = (article: Article) => `/${props.category}/${article.slug}`
 
 onMounted(() => {
-  unsubscribe = subscribeArticlesByCategory(props.category, (data) => {
-    articles.value = data
-    loading.value = false
-  })
+  unsubscribers.push(
+    subscribeArticlesByCategory(props.category, (data) => {
+      articles.value = data
+      loading.value = false
+    }),
+    subscribeAllArticles((data) => {
+      allArticles.value = data
+    })
+  )
 })
 
 onUnmounted(() => {
-  unsubscribe?.()
+  unsubscribers.forEach((unsubscribe) => unsubscribe())
 })
 </script>

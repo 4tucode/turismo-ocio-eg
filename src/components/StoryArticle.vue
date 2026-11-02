@@ -47,9 +47,22 @@
       </figcaption>
     </figure>
 
+    <ShareButtons
+      :url="shareUrl"
+      :title="article.title"
+      class="mx-auto mt-4 px-(--gutter)"
+      :class="article.imageUrl ? 'max-w-page' : 'max-w-[42rem]'"
+    />
+
     <div class="story-body mx-auto mt-12 max-w-[42rem] px-(--gutter)" v-html="article.content"></div>
 
     <footer class="mx-auto mt-16 max-w-[42rem] px-(--gutter)">
+      <ShareButtons
+        :url="shareUrl"
+        :title="article.title"
+        label="¿Te ha gustado? Compártelo"
+        class="mb-12 border-t border-ink pt-6"
+      />
       <RouterLink
         :to="sectionPath"
         class="inline-flex items-center gap-2 border-b border-ink pb-1 text-kicker font-medium uppercase tracking-kicker text-ink no-underline hover:border-accent hover:text-accent"
@@ -83,8 +96,9 @@ import { RouterLink } from 'vue-router'
 import type { Article } from '../services/articleService'
 import { subscribeArticlesByCategory } from '../services/articleService'
 import { categoryLabel, categoryPath, formatLongDate, readingMinutes } from '../utils/editorial'
-import { applyArticleSeo, articlePath, resetSeo } from '../utils/seo'
+import { SITE_URL, applyArticleSeo, articlePath, resetSeo } from '../utils/seo'
 import StoryCard from './StoryCard.vue'
+import ShareButtons from './ShareButtons.vue'
 
 const RELATED_COUNT = 3
 
@@ -95,6 +109,8 @@ const props = defineProps<{
 const sectionPath = computed(() => categoryPath(props.article.category))
 
 const linkTo = articlePath
+
+const shareUrl = computed(() => SITE_URL + articlePath(props.article))
 
 watch(() => props.article, applyArticleSeo, { immediate: true })
 

@@ -1,7 +1,7 @@
 <template>
   <SectionFront
     category="ocio"
-    title="Ocio y Entretenimiento"
+    title="Ocio y entretenimiento"
     description="Vida nocturna, planes y actividades para disfrutar de Guinea Ecuatorial."
   />
 </template>
