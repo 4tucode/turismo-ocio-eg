@@ -110,6 +110,7 @@ import { subscribeEvents, type FirestoreEvent } from '../services/eventService'
 import type { EventCategory } from '../types/blog'
 import festivalImage from '../assets/festival.jpg'
 import arteImage from '../assets/arte.jpg'
+import culturaImage from '../assets/cultura.webp'
 import comidaImage from '../assets/comidaguineana.jpg'
 import deporteImage from '../assets/deporte.jfif'
 
@@ -117,7 +118,8 @@ const route = useRoute()
 
 const CATEGORY_META: Record<EventCategory, { label: string; subtitle: string; icon: string; bg: string }> = {
   musical:     { label: 'Musicales',     subtitle: 'Festivales, conciertos y actuaciones de música y danza tradicional.', icon: '🎵', bg: festivalImage },
-  artistico:   { label: 'Artísticos',    subtitle: 'Exposiciones, teatro y manifestaciones culturales del país.',          icon: '🎨', bg: arteImage },
+  artistico:   { label: 'Artísticos',    subtitle: 'Exposiciones, teatro, danza y artesanía del país.',                    icon: '🎨', bg: arteImage },
+  cultural:    { label: 'Culturales',    subtitle: 'Presentaciones, conferencias, lenguas y tradiciones de Guinea Ecuatorial.', icon: '🏛️', bg: culturaImage },
   gastronomico:{ label: 'Gastronómicos', subtitle: 'Ferias y degustaciones de la rica cocina ecuatoguineana.',             icon: '🍽️', bg: comidaImage },
   deportivo:   { label: 'Deportivos',    subtitle: 'Torneos, competencias y eventos deportivos de todas las disciplinas.', icon: '⚽', bg: deporteImage },
 }

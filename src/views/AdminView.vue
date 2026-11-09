@@ -353,6 +353,7 @@
                 <option value="">Selecciona una categoría</option>
                 <option value="musical">🎵 Musicales</option>
                 <option value="artistico">🎨 Artísticos</option>
+                <option value="cultural">🏛️ Culturales</option>
                 <option value="gastronomico">🍽️ Gastronómicos</option>
                 <option value="deportivo">⚽ Deportivos</option>
               </select>

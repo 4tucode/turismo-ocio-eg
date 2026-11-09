@@ -55,7 +55,7 @@
       </ol>
     </div>
 
-    <div v-else class="grid gap-x-12 sm:grid-cols-2 lg:grid-cols-4">
+    <div v-else class="grid gap-x-12 sm:grid-cols-2 lg:grid-cols-5">
       <RouterLink
         v-for="(category, index) in categories"
         :key="category.key"
@@ -87,7 +87,7 @@
 
     <nav
       v-if="lead"
-      class="mt-12 grid border-t border-on-dark sm:grid-cols-2 lg:grid-cols-4"
+      class="mt-12 grid border-t border-on-dark sm:grid-cols-2 lg:grid-cols-5"
       aria-label="Categorías de eventos"
     >
       <RouterLink
@@ -117,6 +117,7 @@ import { RouterLink } from 'vue-router'
 import type { Event, EventCategory } from '../types/blog'
 import festivalImage from '../assets/festival.jpg'
 import arteImage from '../assets/arte.jpg'
+import culturaImage from '../assets/cultura.webp'
 import gastronomiaImage from '../assets/comidaguineana.jpg'
 import deporteImage from '../assets/deporte.jfif'
 
@@ -125,6 +126,7 @@ const LIST_SIZE = 4
 const CATEGORY_LABELS: Record<EventCategory, string> = {
   musical: 'Musicales',
   artistico: 'Artísticos',
+  cultural: 'Culturales',
   gastronomico: 'Gastronómicos',
   deportivo: 'Deportivos'
 }
@@ -132,6 +134,7 @@ const CATEGORY_LABELS: Record<EventCategory, string> = {
 const CATEGORY_DETAILS: Record<EventCategory, { image: string; description: string }> = {
   musical: { image: festivalImage, description: 'Conciertos, festivales y noches de música en directo.' },
   artistico: { image: arteImage, description: 'Exposiciones, teatro, danza y artesanía.' },
+  cultural: { image: culturaImage, description: 'Presentaciones, conferencias, lenguas y tradiciones.' },
   gastronomico: { image: gastronomiaImage, description: 'Ferias, degustaciones y cocina tradicional.' },
   deportivo: { image: deporteImage, description: 'Torneos, carreras y citas para la afición.' }
 }

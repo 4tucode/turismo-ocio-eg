@@ -1,5 +1,10 @@
 {
+  "functions": {
+    "api/share.ts": { "includeFiles": "dist/index.html" }
+  },
   "rewrites": [
+    { "source": "/:category(cultura|gastronomia|naturaleza|ocio|noticias)/:slug", "destination": "/api/share?category=:category&slug=:slug" },
+    { "source": "/post/:slug", "destination": "/api/share?slug=:slug" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }

@@ -25,7 +25,7 @@ export interface Sponsor {
   website: string
 }
 
-export type EventCategory = 'musical' | 'artistico' | 'gastronomico' | 'deportivo'
+export type EventCategory = 'musical' | 'artistico' | 'cultural' | 'gastronomico' | 'deportivo'
 
 export interface Event {
   id: number | string

@@ -2,7 +2,7 @@
 // Un campo vacío no se muestra.
 export const CONTACT = {
   // Número tal como se verá, con prefijo: '+240 222 000 000'
-  phone: '',
+  phone: '+240 555 52 92 92',
   email: ''
 }
 

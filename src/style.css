@@ -13,11 +13,11 @@
   --color-rule: #d9d4c9;
   --color-accent: #c53030;
   --color-accent-hover: #a82828;
-  --color-accent-soft: #f0c27a;
-  --color-dark: #1f3a2c;
-  --color-dark-rule: #3c5a49;
+  --color-accent-soft: #f5b525;
+  --color-dark: #075a2d;
+  --color-dark-rule: #2f7a4f;
   --color-on-dark: #f7f5f0;
-  --color-on-dark-muted: #b4c4b9;
+  --color-on-dark-muted: #c5dccd;
 
   /* Tipografía */
   --font-display: 'DM Serif Display', 'Playfair Display', Georgia, 'Times New Roman', serif;
